@@ -449,10 +449,11 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-2" fill="currentColor" viewBox="0 0 24 24"><path d="M22.875 10.063c-2.442 5.217-8.337 12.319-12.063 12.319-3.672 0-4.203-7.831-6.208-13.043-.987-2.565-1.624-1.976-3.474-.681l-1.128-1.455c2.698-2.372 5.398-5.127 7.057-5.28 1.868-.179 3.018 1.098 3.448 3.832.568 3.593 1.362 9.17 2.748 9.17 1.08 0 3.741-4.424 3.878-6.006.243-2.316-1.703-2.386-3.392-1.663 2.673-8.754 13.793-7.142 9.134 2.807z"/></svg>
         Vimeo
       </a>
-      <a href="mailto:elowen_zhang@163.com" class="hover:text-blue-400 transition-colors duration-300 flex flex-col items-center">
+      <a href="javascript:void(0)" onclick="showEmail(event)" class="hover:text-blue-400 transition-colors duration-300 flex flex-col items-center">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l-12-9.725v15.438h24v-15.438l-12 9.725z"/></svg>
-        <span data-lang="en">elowen_zhang@163.com</span>
-        <span data-lang="zh" class="hidden">elowen_zhang@163.com</span>
+        <span data-lang="en">Email</span>
+        <span data-lang="zh" class="hidden">邮箱</span>
+        <span id="email-text" class="hidden">elowen_zhang@163.com</span>
       </a>
     </div>
   </section>
@@ -974,6 +975,42 @@
   
   // 添加图片尺寸压缩提示
   console.log('提示: 如需进一步优化加载速度，可将图片压缩至适当分辨率，推荐宽度不超过1200px');
+
+  function showEmail(event) {
+    event.preventDefault();
+    const emailText = document.getElementById('email-text');
+    const emailLink = event.currentTarget;
+    const spans = emailLink.querySelectorAll('span');
+    
+    if (emailText.classList.contains('hidden')) {
+      // 显示邮箱地址
+      emailText.classList.remove('hidden');
+      spans.forEach(span => {
+        if (span.id !== 'email-text') {
+          span.classList.add('hidden');
+        }
+      });
+      
+      // 复制到剪贴板
+      const email = 'elowen_zhang@163.com';
+      navigator.clipboard.writeText(email).then(() => {
+        console.log('邮箱已复制到剪贴板');
+      }).catch(err => {
+        console.error('复制失败: ', err);
+      });
+      
+      // 3秒后恢复原状
+      setTimeout(() => {
+        emailText.classList.add('hidden');
+        spans.forEach(span => {
+          if (span.getAttribute('data-lang') === document.documentElement.lang || 
+             (span.getAttribute('data-lang') === 'en' && !document.documentElement.lang)) {
+            span.classList.remove('hidden');
+          }
+        });
+      }, 3000);
+    }
+  }
 
 </script>
 
