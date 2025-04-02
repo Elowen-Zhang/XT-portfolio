@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nezha – Digital Designer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: #0a0a0a;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    .glow {
+      pointer-events: none;
+      position: fixed;
+      z-index: 1;
+      will-change: transform;
+    }
+    
+    .glow-particles {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background-color: rgba(59,130,246,0.9);
+      pointer-events: none;
+      box-shadow: 0 0 8px 2px rgba(59,130,246,0.8);
+      border-radius: 50%;
+      will-change: transform, opacity;
+    }
+    
+    .glow-trail {
+      position: absolute;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(59,130,246,0.9), transparent);
+      pointer-events: none;
+      transform-origin: left center;
+      will-change: transform, opacity;
+      border-radius: 4px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s ease-out;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #particles {
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    
+    /* 高级背景动画 */
+    .hero-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+      transition: all 0.3s ease-out;
+    }
+    .hero-grain {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4=');
+      opacity: 0.3;
+    }
+    .hero-circle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.3;
+      background: radial-gradient(circle, rgba(59,130,246,0.4), transparent 70%);
+      animation: pulse 8s infinite alternate ease-in-out;
+      transition: all 1s ease-out;
+    }
+    .hero-circle:nth-child(1) {
+      width: 600px;
+      height: 600px;
+      top: -100px;
+      left: -100px;
+      animation-delay: 0s;
+    }
+    .hero-circle:nth-child(2) {
+      width: 500px;
+      height: 500px;
+      bottom: -100px;
+      right: -100px;
+      animation-delay: 2s;
+    }
+    .hero-circle:nth-child(3) {
+      width: 350px;
+      height: 350px;
+      top: 40%;
+      left: 30%;
+      animation-delay: 4s;
+    }
+    .hero-lines {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-size: 50px 50px;
+      background-image: 
+        linear-gradient(to right, rgba(59,130,246,0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(59,130,246,0.08) 1px, transparent 1px);
+      opacity: 0.7;
+      transition: all 0.5s ease-out;
+    }
+    @keyframes pulse {
+      0% {
+        transform: scale(1) translate(0px, 0px);
+        opacity: 0.25;
+      }
+      100% {
+        transform: scale(1.1) translate(10px, 10px);
+        opacity: 0.4;
+      }
+    }
+    
+    /* 流星撞击波纹效果 */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      background: radial-gradient(circle, rgba(59,130,246,0.2), transparent 70%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: -1;
+      animation: rippleEffect 1.5s ease-out forwards;
+    }
+    
+    @keyframes rippleEffect {
+      0% {
+        transform: scale(0);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(3);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="fixed top-6 right-6 z-50 flex">
+    <button onclick="setLang('en')"
+            class="text-sm px-4 py-2 text-white border border-white rounded-l-full hover:bg-white hover:text-black transition-all duration-300 focus:outline-none">
+      EN
+    </button>
+    <button onclick="setLang('zh')"
+            class="text-sm px-4 py-2 text-white border border-white rounded-r-full hover:bg-white hover:text-black transition-all duration-300 focus:outline-none">
+      中
+    </button>
+  </div>
+
+<canvas id="particles"></canvas>
+<div id="cursor-glow" class="glow"></div>
+
+<section class="h-screen flex flex-col items-center justify-center text-center px-6 relative z-10">
+  <div class="hero-background">
+    <div class="hero-grain"></div>
+    <div class="hero-lines"></div>
+    <div class="hero-circle"></div>
+    <div class="hero-circle"></div>
+    <div class="hero-circle"></div>
+  </div>
+  <h1 class="text-6xl md:text-8xl font-bold tracking-wide mb-4 reveal">Elowen</h1>
+  <p class="text-lg md:text-2xl text-gray-400 reveal" data-lang="en">Creating visual stories that transcend reality</p>
+  <p class="text-lg md:text-2xl text-gray-400 reveal hidden" data-lang="zh">创造超越现实的视觉故事</p>
+  <div class="mt-12 reveal">
+    <a href="#projects" class="group relative inline-flex items-center px-8 py-3 overflow-hidden rounded-full border border-blue-500 text-blue-500 hover:text-white transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]">
+      <span class="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-400 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
+      <span class="relative z-10 flex items-center gap-2" data-lang="en">
+        Discover my work
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:translate-y-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+      </span>
+      <span class="relative z-10 flex items-center gap-2 hidden" data-lang="zh">
+        探索我的作品
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:translate-y-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+      </span>
+    </a>
+  </div>
+</section>
+
+<section id="projects" class="py-24 px-6 bg-transparent relative z-10 backdrop-blur-sm">
+  <h2 class="text-4xl font-semibold text-center mb-16 reveal" data-lang="en">Featured Projects</h2>
+  <h2 class="text-4xl font-semibold text-center mb-16 reveal hidden" data-lang="zh">精选项目</h2>
+  <div class="space-y-24 max-w-6xl mx-auto">
+
+    <div class="grid md:grid-cols-2 gap-12 items-center reveal">
+      <div class="md:order-2 relative group overflow-hidden rounded-xl h-[400px]">
+        <img src="./assets/images/Variation_pic1.png" class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" />
+        <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700">
+          <source src="./assets/videos/Variation_video1.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div class="md:order-1 space-y-4">
+        <p class="text-sm text-blue-400 uppercase tracking-widest reveal" data-lang="en"">2022 · Animation</p>
+        <p class="text-sm text-blue-400 uppercase tracking-widest reveal hidden" data-lang="zh"">2022 · 动画</p>
+        <h3 class="text-3xl font-semibold text-white reveal" data-lang="en" >Variation</h3>
+        <h3 class="text-3xl font-semibold text-white reveal hidden" data-lang="zh" >变异</h3>
+        <p class="text-gray-400 reveal" data-lang="en">In the tides of tomorrow, nature is no longer natural—life is rewritten by code.</p>
+        <p class="text-gray-400 reveal hidden" data-lang="zh">在未来的潮汐中，生态已非自然，生命的形状由算法书写。</p>
+        <div class="group mt-6 relative w-fit">
+          <a href="variation.html" class="block px-6 py-2 text-blue-500 border border-blue-500 rounded-full overflow-hidden relative z-10 group-hover:text-white transition">
+            <span class="absolute inset-0 bg-blue-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-0"></span>
+            <span class="relative z-10" data-lang="en">Preview Project</span>
+            <span class="relative z-10 hidden" data-lang="zh">查看详情</span>
+          </a>
+        </div>        
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-12 items-center reveal">
+        <div class="relative group overflow-hidden rounded-xl h-[400px]">
+            <img src="./assets/images/amiam_pic1.png"
+                 class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" />
+            <video autoplay muted loop playsinline
+                 class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700">
+              <source src="./assets/videos/amiam_video1.mp4" type="video/mp4" />
+            </video>
+          </div> 
+      <div class="space-y-4">
+        <p class="text-sm text-blue-400 uppercase tracking-widest reveal" data-lang="en">2024 · Game Design</p>
+        <p class="text-sm text-blue-400 uppercase tracking-widest reveal hidden" data-lang="zh">2024 · 游戏设计</p>
+        <h3 class="text-3xl font-semibold text-white reveal" data-lang="en">Am, I Am: Beneath the Infinite Sky</h3>
+        <h3 class="text-3xl font-semibold text-white reveal hidden" data-lang="zh">我即我：无垠天空之下</h3>
+        <p class="text-gray-400 reveal" data-lang="en">You don't need to become more.Only return — to who you truly are.</p>
+        <p class="text-gray-400 reveal hidden" data-lang="zh">你不必成为更多，只需回到你本来的样子。</p>
+        <div class="group mt-6 relative w-fit">
+          <a href="amiam.html" class="block px-6 py-2 text-blue-500 border border-blue-500 rounded-full overflow-hidden relative z-10 group-hover:text-white transition">
+            <span class="absolute inset-0 bg-blue-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-0"></span>
+            <span class="relative z-10" data-lang="en">Preview Project</span>
+            <span class="relative z-10 hidden" data-lang="zh">查看详情</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-12 items-center reveal">
+      <div class="md:order-2 relative group overflow-hidden rounded-xl h-[400px]">
+        <img src="./assets/images/room_PIC1.png" class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" />
+        <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700">
+          <source src="./assets/videos/room_v1.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div class="md:order-1 space-y-4">
+        <p class="text-sm text-blue-400 uppercase tracking-widest reveal" data-lang="en"">2022 · Animation</p>
+        <p class="text-sm text-blue-400 uppercase tracking-widest reveal hidden" data-lang="zh"">2022 · 动画</p>
+        <h3 class="text-3xl font-semibold text-white reveal" data-lang="en" >Room</h3>
+        <h3 class="text-3xl font-semibold text-white reveal hidden" data-lang="zh" >室</h3>
+        <p class="text-gray-400 reveal" data-lang="en">When policies draw the line, desire slips through the cracks of the algorithm.</p>
+        <p class="text-gray-400 reveal hidden" data-lang="zh">当规则设限，欲望便钻进算法的缝隙生长。</p>
+        <div class="group mt-6 relative w-fit">
+          <a href="Room.html" class="block px-6 py-2 text-blue-500 border border-blue-500 rounded-full overflow-hidden relative z-10 group-hover:text-white transition">
+            <span class="absolute inset-0 bg-blue-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-0"></span>
+            <span class="relative z-10" data-lang="en">Preview Project</span>
+            <span class="relative z-10 hidden" data-lang="zh">查看详情</span>
+          </a>
+        </div>        
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-12 items-center reveal">
+      <div class="relative group overflow-hidden rounded-xl h-[400px]">
+          <img src="./assets/images/Reminisce_pic1.png"
+               class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" />
+          <video autoplay muted loop playsinline
+               class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700">
+            <source src="./assets/videos/Reminisce_video1.mp4" type="video/mp4" />
+          </video>
+        </div> 
+    <div class="space-y-4">
+      <p class="text-sm text-blue-400 uppercase tracking-widest reveal" data-lang="en">2024 · Game Design</p>
+      <p class="text-sm text-blue-400 uppercase tracking-widest reveal hidden" data-lang="zh">2024 · 游戏设计</p>
+      <h3 class="text-3xl font-semibold text-white reveal" data-lang="en">Reminisce</h3>
+      <h3 class="text-3xl font-semibold text-white reveal hidden" data-lang="zh">明日之前</h3>
+      <p class="text-gray-400 reveal" data-lang="en">Memory doesn't fade.It only waits — for you to look back.</p>
+      <p class="text-gray-400 reveal hidden" data-lang="zh">记忆未曾褪色，它只是静静地等待你再次凝视。</p>
+      <div class="group mt-6 relative w-fit">
+        <a href="Reminisce.html" class="block px-6 py-2 text-blue-500 border border-blue-500 rounded-full overflow-hidden relative z-10 group-hover:text-white transition">
+          <span class="absolute inset-0 bg-blue-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-0"></span>
+          <span class="relative z-10" data-lang="en">Preview Project</span>
+          <span class="relative z-10 hidden" data-lang="zh">查看详情</span>
+        </a>
+      </div>      
+    </div>
+  </div>
+
+    <div class="grid md:grid-cols-2 gap-12 items-center reveal">
+      <div class="md:order-2 relative group overflow-hidden rounded-xl h-[400px]">
+        <img src="./assets/images/Paradise_pic1.png" class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" />
+        <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700">
+          <source src="./assets/videos/Paradise_video1.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div class="md:order-1 space-y-4">
+        <p class="text-sm text-blue-400 uppercase tracking-widest">2022 · Game Design</p>
+        <h3 class="text-3xl font-semibold text-white reveal" data-lang="en" >Paradise</h3>
+        <h3 class="text-3xl font-semibold text-white reveal hidden" data-lang="zh" >乐园</h3>
+        <p class="text-gray-400 reveal" data-lang="en">Welcome to the realm of illusion—where every emotion is curated, and every memory comes with a price.</p>
+        <p class="text-gray-400 reveal hidden" data-lang="zh">欢迎来到幻象之境，在这里，每一份情感，都是为你量身打造的商品。 </p>
+        <div class="group mt-6 relative w-fit">
+          <a href="Paradise.html" class="block px-6 py-2 text-blue-500 border border-blue-500 rounded-full overflow-hidden relative z-10 group-hover:text-white transition">
+            <span class="absolute inset-0 bg-blue-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-0"></span>
+            <span class="relative z-10" data-lang="en">Preview Project</span>
+            <span class="relative z-10 hidden" data-lang="zh">查看详情</span>
+          </a>
+        </div>        
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-12 items-center reveal">
+      <div class="relative group overflow-hidden rounded- h-[300px]">
+          <img src="./assets/images/Mirage_pic1.png"
+               class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" />
+          <video autoplay muted loop playsinline
+               class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700">
+            <source src="./assets/videos/mirage_v1.mp4" type="video/mp4" />
+          </video>
+        </div> 
+    <div class="space-y-4">
+      <p class="text-sm text-blue-400 uppercase tracking-widest reveal" data-lang="en">2024 · Interaction Design</p>
+      <p class="text-sm text-blue-400 uppercase tracking-widest reveal hidden" data-lang="zh">2024 · 交互设计</p>
+      <h3 class="text-3xl font-semibold text-white reveal" data-lang="en">Mirage</h3>
+      <h3 class="text-3xl font-semibold text-white reveal hidden" data-lang="zh">虚壤</h3>
+      <p class="text-gray-400 reveal" data-lang="en">"That which sleeps remembers its form. When you descend, the calling shall begin."</p>
+      <p class="text-gray-400 reveal hidden" data-lang="zh">沉眠之物尚未遗忘祂的形体。当你抵达深层，呼唤便将开始。</p>
+      <div class="group mt-6 relative w-fit">
+        <a href="Mirage.html" class="block px-6 py-2 text-blue-500 border border-blue-500 rounded-full overflow-hidden relative z-10 group-hover:text-white transition">
+          <span class="absolute inset-0 bg-blue-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-0"></span>
+          <span class="relative z-10" data-lang="en">Preview Project</span>
+          <span class="relative z-10 hidden" data-lang="zh">查看详情</span>
+        </a>
+      </div>      
+    </div>
+  </div>
+
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="py-20 px-6 text-center relative z-10 mt-20">
+    <h2 class="text-3xl font-semibold mb-4 reveal" data-lang="en">Get in Touch</h2>
+    <h2 class="text-3xl font-semibold mb-4 reveal hidden" data-lang="zh">与我联系</h2>
+    <p class="text-gray-400 mb-8 reveal" data-lang="en">Interested in working together? I'd love to hear from you.</p>
+    <p class="text-gray-400 mb-8 reveal hidden" data-lang="zh">有兴趣一起合作吗？我很期待您的来信。</p>
+    <div class="mt-10 flex justify-center gap-8 text-lg reveal">
+      <a href="https://www.youtube.com/@hinatahajime9042" target="_blank" rel="noopener" class="hover:text-blue-400 transition-colors duration-300 flex flex-col items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-2" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+        YouTube
+      </a>
+      <a href="https://vimeo.com/user189901285" target="_blank" rel="noopener" class="hover:text-blue-400 transition-colors duration-300 flex flex-col items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-2" fill="currentColor" viewBox="0 0 24 24"><path d="M22.875 10.063c-2.442 5.217-8.337 12.319-12.063 12.319-3.672 0-4.203-7.831-6.208-13.043-.987-2.565-1.624-1.976-3.474-.681l-1.128-1.455c2.698-2.372 5.398-5.127 7.057-5.28 1.868-.179 3.018 1.098 3.448 3.832.568 3.593 1.362 9.17 2.748 9.17 1.08 0 3.741-4.424 3.878-6.006.243-2.316-1.703-2.386-3.392-1.663 2.673-8.754 13.793-7.142 9.134 2.807z"/></svg>
+        Vimeo
+      </a>
+      <a href="mailto:elowen_zhang@163.com" class="hover:text-blue-400 transition-colors duration-300 flex flex-col items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l-12-9.725v15.438h24v-15.438l-12 9.725z"/></svg>
+        Email
+      </a>
+    </div>
+  </section>
+  
+
+<!-- Scripts -->
+<script>
+  // 鼠标光点跟随效果
+  const glow = document.getElementById("cursor-glow");
+  const heroBackground = document.querySelector(".hero-background");
+  const heroCircles = document.querySelectorAll(".hero-circle");
+  const heroLines = document.querySelector(".hero-lines");
+  
+  let mouseX = 0;
+  let mouseY = 0;
+  
+  // 鼠标移动事件
+  document.addEventListener("mousemove", (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    
+    // 移动时的粒子产生概率
+    if (Math.random() < 0.4) {
+      createShooting();
+    }
+    
+    // 更新首页背景 - 只在首屏才交互
+    const heroSection = document.querySelector(".hero-background");
+    if (heroSection && isElementInViewport(heroSection)) {
+      // 计算鼠标在屏幕上的相对位置 (0-1)
+      const relX = mouseX / window.innerWidth;
+      const relY = mouseY / window.innerHeight;
+      
+      // 创建微妙的移动效果 - 根据鼠标位置
+      heroCircles.forEach((circle, index) => {
+        // 随机移动方向基于索引
+        const moveX = (relX - 0.5) * 20 * (index % 2 === 0 ? 1 : -1);
+        const moveY = (relY - 0.5) * 20 * (index % 2 === 0 ? -1 : 1);
+        circle.style.transform = `translate(${moveX}px, ${moveY}px)`;
+      });
+      
+      // 调整网格线的不透明度
+      heroLines.style.opacity = 0.5 + (relY * 0.4);
+    }
+  });
+  
+  function isElementInViewport(el) {
+    const rect = el.getBoundingClientRect();
+    return (
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+  }
+  
+  // 创建流星散射效果
+  function createShooting() {
+    // 创建流星粒子
+    const particle = document.createElement('div');
+    const trail = document.createElement('div');
+    
+    // 随机角度和距离
+    const angle = Math.random() * Math.PI * 2;
+    const distance = Math.random() * 120 + 60;
+    const duration = Math.random() * 1000 + 400;
+    const size = Math.random() * 4 + 2;
+    
+    // 设置粒子样式
+    particle.className = 'glow-particles';
+    trail.className = 'glow-trail';
+    
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    
+    trail.style.width = `${distance/2}px`;
+    trail.style.height = `${size/1.5}px`;
+    
+    // 添加到DOM
+    glow.appendChild(particle);
+    glow.appendChild(trail);
+    
+    // 设置初始位置 - 使用当前鼠标位置
+    const x = mouseX;
+    const y = mouseY;
+    
+    // 创建撞击波纹
+    if (Math.random() < 0.3 && heroBackground && isElementInViewport(heroBackground)) {
+      setTimeout(() => {
+        createRipple(x + Math.cos(angle) * distance, y + Math.sin(angle) * distance, size * 10);
+      }, duration);
+    }
+    
+    // 动画时间
+    let startTime = null;
+    
+    // 动画函数
+    function animate(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const progress = (timestamp - startTime) / duration;
+      
+      if (progress < 1) {
+        // 计算当前位置
+        const currentDistance = distance * progress;
+        const moveX = Math.cos(angle) * currentDistance;
+        const moveY = Math.sin(angle) * currentDistance;
+        
+        // 应用位置和透明度
+        particle.style.transform = `translate(${x + moveX}px, ${y + moveY}px)`;
+        particle.style.opacity = 1 - progress;
+        
+        // 设置拖尾
+        trail.style.width = `${currentDistance}px`;
+        trail.style.transform = `translate(${x}px, ${y}px) rotate(${angle * (180/Math.PI)}deg)`;
+        trail.style.opacity = (1 - progress) * 0.8;
+        
+        requestAnimationFrame(animate);
+      } else {
+        // 移除元素
+        particle.remove();
+        trail.remove();
+      }
+    }
+    
+    requestAnimationFrame(animate);
+  }
+  
+  // 创建波纹效果
+  function createRipple(x, y, size) {
+    // 检查是否在首屏
+    if (!isElementInViewport(heroBackground)) return;
+    
+    const ripple = document.createElement('div');
+    ripple.className = 'ripple';
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    ripple.style.width = `${size}px`;
+    ripple.style.height = `${size}px`;
+    
+    document.body.appendChild(ripple);
+    
+    // 波纹结束后移除
+    setTimeout(() => {
+      ripple.remove();
+    }, 1500);
+    
+    // 微调背景圆形
+    heroCircles.forEach(circle => {
+      // 随机调整亮度
+      circle.style.opacity = 0.3 + (Math.random() * 0.2);
+    });
+  }
+  
+  function animateGlow() {
+    // 随机创建流星效果 (静止时的产生概率)
+    if (Math.random() < 0.05) {
+      createShooting();
+    }
+    
+    requestAnimationFrame(animateGlow);
+  }
+  
+  animateGlow();
+
+  const canvas = document.getElementById("particles");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let particlesArray = [];
+  const maxParticles = 80;
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 2 + 1;
+      this.speedX = Math.random() * 0.6 - 0.3;
+      this.speedY = Math.random() * 0.6 - 0.3;
+    }
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+      if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+    }
+    draw() {
+      ctx.fillStyle = "rgba(59,130,246,0.2)";
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function initParticles() {
+    for (let i = 0; i < maxParticles; i++) {
+      particlesArray.push(new Particle());
+    }
+  }
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particlesArray.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animateParticles);
+  }
+
+  initParticles();
+  animateParticles();
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  const revealEls = document.querySelectorAll(".reveal");
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add("visible");
+    });
+  }, { threshold: 0.1 });
+  revealEls.forEach(el => observer.observe(el));
+
+  function openModal(id) {
+    document.getElementById(id).classList.remove('hidden');
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.add('hidden');
+  }
+
+  function setLang(lang) {
+    document.querySelectorAll('[data-lang]').forEach(el => {
+      if (el.classList.contains('hidden') && el.getAttribute('data-lang') === lang) {
+        el.classList.remove('hidden');
+      } else if (!el.classList.contains('hidden') && el.getAttribute('data-lang') !== lang) {
+        el.classList.add('hidden');
+      }
+    });
+  }
+
+</script>
+
+</body>
+</html>

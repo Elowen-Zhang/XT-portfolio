@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Variation – Project</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <style>
+    html { 
+      scroll-behavior: smooth;
+      background-color: #0a0a0a;
+    }
+    body {
+      color: white;
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+    }
+    .lang-btn.active {
+      background-color: white;
+      color: black;
+    }
+    .project-header {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding-top: 80px;
+    }
+    .video-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      background: #000;
+    }
+    .video-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8));
+      z-index: 1;
+      pointer-events: none;
+    }
+    .project-title {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 2rem;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s ease-out forwards;
+    }
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      cursor: pointer;
+    }
+    .scroll-indicator.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .scroll-indicator svg {
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-20px); }
+      60% { transform: translateY(-10px); }
+    }
+    .content-section {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease-out;
+    }
+    .content-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .nav-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: background-color 0.3s ease;
+    }
+    .nav-container.scrolled {
+      background: rgba(10, 10, 10, 0.95);
+    }
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+    .back-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: white;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+    .back-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .lang-switch {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .lang-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      background: transparent;
+      color: white;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .lang-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .lang-btn.active {
+      background: white;
+      color: black;
+      border-color: white;
+    }
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .video-link {
+      position: absolute;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: white;
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s ease-out 0.5s forwards;
+    }
+    .video-link:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+    .video-link svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      transition: transform 0.3s ease;
+    }
+    .video-link:hover svg {
+      transform: translateX(4px);
+    }
+    @media (max-width: 768px) {
+      .video-link {
+        bottom: 1rem;
+        right: 1rem;
+        padding: 0.5rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body class="overflow-x-hidden">
+
+<!-- Navigation -->
+<nav class="nav-container">
+  <div class="nav-left">
+    <a href="index.html" class="back-link">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      <span data-lang="en">Back</span>
+      <span class="hidden" data-lang="zh">返回</span>
+    </a>
+  </div>
+  <div class="lang-switch">
+    <button onclick="setLang('en')" class="lang-btn">EN</button>
+    <button onclick="setLang('zh')" class="lang-btn">中</button>
+  </div>
+</nav>
+
+<!-- Project Header -->
+<div class="project-header">
+  <div class="video-container">
+    <div class="video-wrapper">
+      <iframe title="vimeo-player" src="https://player.vimeo.com/video/786170236?h=da85e07cb3&autoplay=1&loop=1&muted=1&controls=0" width="640" height="360" frameborder="0" allowfullscreen></iframe>
+    </div>
+    <div class="video-overlay"></div>
+  </div>
+  <div class="project-title">
+    <h1 class="text-6xl font-bold mb-4" data-lang="en">Paradise</h1>
+    <h1 class="text-6xl font-bold mb-4 hidden" data-lang="zh">乐园</h1>
+    <p class="text-blue-400 text-sm uppercase tracking-widest" data-lang="en">2024 · Game Design / VR</p>
+    <p class="text-blue-400 text-sm uppercase tracking-widest hidden" data-lang="zh">2024 · 游戏设计 / VR</p>
+  </div>
+  <div class="scroll-indicator" onclick="scrollToContent()">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+    </svg>
+  </div>
+  <a href="https://vimeo.com/786170236" target="_blank" class="video-link">
+    <span data-lang="en">Watch on Vimeo</span>
+    <span class="hidden" data-lang="zh">在 Vimeo 上观看</span>
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+    </svg>
+  </a>
+</div>
+
+<!-- Project Info -->
+<section class="max-w-4xl mx-auto px-6 py-24" id="content">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24">
+    <div class="content-section">
+      <h2 class="text-2xl font-semibold mb-6 text-left" data-lang="en">Project Overview</h2>
+      <h2 class="text-2xl font-semibold mb-6 text-left hidden" data-lang="zh">项目概述</h2>
+      <p class="text-gray-300 text-left" data-lang="en">A speculative game design exploring the hyperreal realm of theme parks, where consumption and emotional practices intertwine in a cycle of simulated experiences.</p>
+      <p class="text-gray-300 text-left hidden" data-lang="zh">主题公园在消费实践与情感实践的同构化中引导游客消费，是现代资本主义理想化世俗所创造出的超真实场域，是由数字代码拟真出来的"真实的荒漠"。游客带着某段'幻像'的依恋而来，在大量精心设计的情感符号之中。消费进一步加深了情感依恋，游客在主题符号中不断循环。</p>
+    </div>
+    <div class="content-section">
+      <h2 class="text-2xl font-semibold mb-6 text-left" data-lang="en">Technical Details</h2>
+      <h2 class="text-2xl font-semibold mb-6 text-left hidden" data-lang="zh">技术细节</h2>
+      <ul class="text-gray-300 space-y-2 text-left" data-lang="en">
+        <li data-lang="en">Software: Unity, Cinema 4D, SP, Zbrush, After Effects</li>
+        <li data-lang="en">Year: 2022</li>
+      </ul>
+      <ul class="text-gray-300 space-y-2 text-left hidden" data-lang="zh">
+        <li data-lang="zh">软件：Unity, Cinema 4D, SP, Zbrush, After Effects</li>
+        <li data-lang="zh">年份：2022</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Content Blocks -->
+<section class="max-w-3xl mx-auto px-6 space-y-12 pb-24">
+  <!-- EN -->
+  <div class="space-y-8 content-section" data-lang="en">
+    <p class="text-xl leading-relaxed text-left">Welcome to Paradise, where reality and illusion intertwine.</p>
+    <p class="text-gray-300 text-left">In this hyperreal realm of theme parks, every emotion is carefully curated, every memory comes with a price tag.</p>
+    <p class="text-gray-300 text-left">Visitors arrive with their nostalgic attachments to certain 'illusions', finding themselves immersed in a sea of meticulously designed emotional symbols.</p>
+    <p class="text-gray-300 text-left">Consumption deepens emotional bonds, creating an endless cycle within the themed symbols.</p>
+    <p class="text-gray-300 text-left">This is a space where consumption practices and emotional experiences become one, a hyperreal field created by modern capitalism's idealized secular world.</p>
+    <p class="text-gray-300 text-left">A desert of reality simulated by digital codes, where every experience is carefully orchestrated to maintain the illusion.</p>
+    <p class="text-xl italic mt-8 text-left"><em>In Paradise, reality is what you make it to be.</em></p>
+  </div>
+
+  <!-- ZH -->
+  <div class="space-y-8 content-section hidden" data-lang="zh">
+    <p class="text-xl leading-relaxed text-left">欢迎来到乐园，在这里现实与幻象交织。</p>
+    <p class="text-gray-300 text-left">在这个主题公园的超真实场域中，每一份情感都被精心设计，每一段记忆都标有价格。</p>
+    <p class="text-gray-300 text-left">游客带着对某段'幻像'的依恋而来，在大量精心设计的情感符号之中沉浸。</p>
+    <p class="text-gray-300 text-left">消费进一步加深了情感依恋，游客在主题符号中不断循环。</p>
+    <p class="text-gray-300 text-left">这是一个消费实践与情感实践同构化的空间，是现代资本主义理想化世俗所创造出的超真实场域。</p>
+    <p class="text-gray-300 text-left">由数字代码拟真出来的"真实的荒漠"，每一次体验都被精心编排以维持幻象。</p>
+    <p class="text-xl italic mt-8 text-left"><em>在乐园中，现实就是你所相信的样子。</em></p>
+  </div>
+</section>
+
+<!-- Footer Contact -->
+<footer class="text-center text-sm text-gray-500 py-12 border-t border-gray-800">
+  <p data-lang="en">Designed by Elowen · ©2025</p>
+  <p class="hidden" data-lang="zh">由Elowen设计 · ©2025</p>
+</footer>
+
+<!-- Scripts -->
+<script>
+  function setLang(lang) {
+    document.querySelectorAll('[data-lang]').forEach(el => {
+      el.style.display = el.getAttribute('data-lang') === lang ? 'block' : 'none';
+    });
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.textContent.trim().toLowerCase() === lang) btn.classList.add('active');
+    });
+  }
+
+  // 滚动到内容区域
+  function scrollToContent() {
+    document.getElementById('content').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // 监听滚动事件
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('.nav-container');
+    const scrollIndicator = document.querySelector('.scroll-indicator');
+    
+    // 导航栏背景透明度
+    if (window.scrollY > 50) {
+      nav.classList.add('scrolled');
+    } else {
+      nav.classList.remove('scrolled');
+    }
+
+    // 隐藏/显示滚动指示器
+    if (window.scrollY > 100) {
+      scrollIndicator.classList.add('hidden');
+    } else {
+      scrollIndicator.classList.remove('hidden');
+    }
+  });
+
+  // Intersection Observer for fade-in animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, {
+    threshold: 0.1
+  });
+
+  document.querySelectorAll('.content-section').forEach(section => {
+    observer.observe(section);
+  });
+
+  setLang('en'); // default
+</script>
+
+</body>
+</html>
