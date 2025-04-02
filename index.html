@@ -163,6 +163,40 @@
         opacity: 0;
       }
     }
+    
+    /* 视频播放相关样式 */
+    .group {
+      position: relative;
+    }
+    
+    video {
+      transition: opacity 0.5s ease;
+    }
+    
+    .group img, .group video {
+      transition: opacity 0.5s ease;
+    }
+    
+    /* 改变鼠标指针为指示可点击 */
+    .group:hover {
+      cursor: pointer;
+    }
+    
+    /* 优化视频播放按钮显示效果 */
+    .play-button {
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    
+    .group:hover .play-button {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.05);
+    }
+    
+    .group .play-button:hover {
+      transform: translate(-50%, -50%) scale(1.1);
+      background-color: rgba(59,130,246,0.7);
+    }
   </style>
 </head>
 
@@ -618,34 +652,98 @@
     });
   }
 
-  // 懒加载视频
+  // 完全改进视频懒加载
   function setupVideoLazyLoading() {
     // 获取所有视频元素
     const videos = document.querySelectorAll('video[data-src]');
+    const videoContainers = document.querySelectorAll('.group');
     
-    // 创建 IntersectionObserver
+    // 添加播放视频按钮到每个视频容器
+    videoContainers.forEach(container => {
+      const playButton = document.createElement('div');
+      playButton.className = 'play-button';
+      playButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M8 5v14l11-7z"/></svg>';
+      playButton.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 5;
+        background-color: rgba(0,0,0,0.5);
+        border-radius: 50%;
+        padding: 15px;
+        display: none;
+        cursor: pointer;
+      `;
+      container.appendChild(playButton);
+      
+      // 鼠标悬停时显示播放按钮
+      container.addEventListener('mouseenter', () => {
+        playButton.style.display = 'block';
+      });
+      
+      container.addEventListener('mouseleave', () => {
+        playButton.style.display = 'none';
+      });
+    });
+    
+    // 处理所有视频懒加载
+    videos.forEach(video => {
+      const container = video.closest('.group');
+      const playButton = container.querySelector('.play-button');
+      
+      if (playButton) {
+        // 点击播放按钮时加载并播放视频
+        playButton.addEventListener('click', () => {
+          if (!video.hasAttribute('src')) {
+            // 添加source元素
+            const source = document.createElement('source');
+            source.src = video.dataset.src;
+            source.type = 'video/mp4';
+            
+            // 添加到视频元素
+            video.appendChild(source);
+            video.load();
+            
+            // 逐渐显示视频
+            video.style.opacity = '1';
+            // 隐藏图片
+            const img = container.querySelector('img');
+            if (img) img.style.opacity = '0';
+            
+            // 播放视频
+            video.play().catch(e => console.log('视频自动播放失败:', e));
+            
+            // 隐藏播放按钮
+            playButton.style.display = 'none';
+          } else {
+            // 如果已加载，则切换播放/暂停
+            if (video.paused) {
+              video.play();
+              playButton.style.display = 'none';
+            } else {
+              video.pause();
+            }
+          }
+        });
+      }
+    });
+    
+    // IntersectionObserver观察视频容器是否进入视口
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          const video = entry.target;
-          // 创建 source 元素
-          const source = document.createElement('source');
-          source.src = video.dataset.src;
-          source.type = 'video/mp4';
+          // 只有进入视口才显示播放按钮
+          const container = entry.target;
+          const playButton = container.querySelector('.play-button');
+          if (playButton) {
+            container.addEventListener('mouseenter', () => {
+              playButton.style.display = 'block';
+            });
+          }
           
-          // 添加到视频元素
-          video.appendChild(source);
-          
-          // 监听鼠标悬停事件
-          video.closest('.group').addEventListener('mouseenter', () => {
-            if (video.paused) {
-              video.load();
-              video.play().catch(e => console.log('视频自动播放失败:', e));
-            }
-          });
-          
-          // 停止观察此元素
-          observer.unobserve(video);
+          // 停止观察已进入视口的容器
+          observer.unobserve(container);
         }
       });
     }, {
@@ -653,16 +751,18 @@
       rootMargin: '100px'
     });
     
-    // 开始观察所有视频
-    videos.forEach(video => {
-      observer.observe(video);
+    // 开始观察所有视频容器
+    videoContainers.forEach(container => {
+      observer.observe(container);
     });
   }
-
-  // 注册Service Worker实现缓存
+  
+  // 注册Service Worker实现缓存 - 修复路径问题
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/sw.js').then(function(registration) {
+      // 获取当前站点的基本路径
+      const basePath = window.location.pathname.replace(/\/[^\/]*$/, '/');
+      navigator.serviceWorker.register(basePath + 'sw.js').then(function(registration) {
         console.log('ServiceWorker注册成功: ', registration.scope);
       }, function(err) {
         console.log('ServiceWorker注册失败: ', err);
