@@ -4,6 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Elowen – WEB</title>
+  
+  <!-- 预加载关键CSS资源 -->
+  <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+  
+  <!-- 预加载首屏图片 -->
+  <link rel="preload" href="./assets/images/Variation_pic1.png" as="image" media="(min-width: 768px)">
+  
+  <!-- PWA缓存支持 -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0a0a">
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     
@@ -208,9 +219,8 @@
 
     <div class="grid md:grid-cols-2 gap-12 items-center reveal">
       <div class="md:order-2 relative group overflow-hidden rounded-xl h-[400px]">
-        <img src="./assets/images/Variation_pic1.png" class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" />
-        <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700">
-          <source src="./assets/videos/Variation_video1.mp4" type="video/mp4" />
+        <img src="./assets/images/Variation_pic1.png" class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" loading="lazy" />
+        <video class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700" preload="none" muted loop playsinline data-src="./assets/videos/Variation_video1.mp4">
         </video>
       </div>
       <div class="md:order-1 space-y-4">
@@ -233,10 +243,8 @@
     <div class="grid md:grid-cols-2 gap-12 items-center reveal">
         <div class="relative group overflow-hidden rounded-xl h-[400px]">
             <img src="./assets/images/amiam_pic1.png"
-                 class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" />
-            <video autoplay muted loop playsinline
-                 class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700">
-              <source src="./assets/videos/amiam_video1.mp4" type="video/mp4" />
+                 class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" loading="lazy" />
+            <video class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700" preload="none" muted loop playsinline data-src="./assets/videos/amiam_video1.mp4">
             </video>
           </div> 
       <div class="space-y-4">
@@ -258,9 +266,8 @@
 
     <div class="grid md:grid-cols-2 gap-12 items-center reveal">
       <div class="md:order-2 relative group overflow-hidden rounded-xl h-[400px]">
-        <img src="./assets/images/room_PIC1.png" class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" />
-        <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700">
-          <source src="./assets/videos/room_v1.mp4" type="video/mp4" />
+        <img src="./assets/images/room_PIC1.png" class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" loading="lazy" />
+        <video class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700" preload="none" muted loop playsinline data-src="./assets/videos/room_v1.mp4">
         </video>
       </div>
       <div class="md:order-1 space-y-4">
@@ -283,10 +290,8 @@
     <div class="grid md:grid-cols-2 gap-12 items-center reveal">
       <div class="relative group overflow-hidden rounded-xl h-[400px]">
           <img src="./assets/images/Reminisce_pic1.png"
-               class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" />
-          <video autoplay muted loop playsinline
-               class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700">
-            <source src="./assets/videos/Reminisce_video1.mp4" type="video/mp4" />
+               class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" loading="lazy" />
+          <video class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700" preload="none" muted loop playsinline data-src="./assets/videos/Reminisce_video1.mp4">
           </video>
         </div> 
     <div class="space-y-4">
@@ -308,9 +313,8 @@
 
     <div class="grid md:grid-cols-2 gap-12 items-center reveal">
       <div class="md:order-2 relative group overflow-hidden rounded-xl h-[400px]">
-        <img src="./assets/images/Paradise_pic1.png" class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" />
-        <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700">
-          <source src="./assets/videos/Paradise_video1.mp4" type="video/mp4" />
+        <img src="./assets/images/Paradise_pic1.png" class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" loading="lazy" />
+        <video class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700" preload="none" muted loop playsinline data-src="./assets/videos/Paradise_video1.mp4">
         </video>
       </div>
       <div class="md:order-1 space-y-4">
@@ -332,10 +336,8 @@
     <div class="grid md:grid-cols-2 gap-12 items-center reveal">
       <div class="relative group overflow-hidden rounded- h-[400px]">
           <img src="./assets/images/Mirage_pic1.png"
-               class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" />
-          <video autoplay muted loop playsinline
-               class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700">
-            <source src="./assets/videos/mirage_v1.mp4" type="video/mp4" />
+               class="w-full h-full object-cover rounded-xl transition duration-700 group-hover:opacity-0" loading="lazy" />
+          <video class="absolute inset-0 w-full h-full object-cover rounded-xl opacity-0 group-hover:opacity-100 transition duration-700" preload="none" muted loop playsinline data-src="./assets/videos/mirage_v1.mp4">
           </video>
         </div> 
     <div class="space-y-4">
@@ -392,13 +394,13 @@
   let mouseX = 0;
   let mouseY = 0;
   
-  // 鼠标移动事件
+  // 减少鼠标移动时的粒子生成率
   document.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
     
-    // 移动时的粒子产生概率
-    if (Math.random() < 0.4) {
+    // 降低移动时的粒子产生概率
+    if (Math.random() < 0.2) {
       createShooting();
     }
     
@@ -530,8 +532,8 @@
   }
   
   function animateGlow() {
-    // 随机创建流星效果 (静止时的产生概率)
-    if (Math.random() < 0.05) {
+    // 降低随机创建流星效果的概率 (静止时的产生概率)
+    if (Math.random() < 0.02) {
       createShooting();
     }
     
@@ -546,7 +548,8 @@
   canvas.height = window.innerHeight;
 
   let particlesArray = [];
-  const maxParticles = 80;
+  // 减少粒子数量
+  const maxParticles = 40;
 
   class Particle {
     constructor() {
@@ -614,6 +617,88 @@
       }
     });
   }
+
+  // 懒加载视频
+  function setupVideoLazyLoading() {
+    // 获取所有视频元素
+    const videos = document.querySelectorAll('video[data-src]');
+    
+    // 创建 IntersectionObserver
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const video = entry.target;
+          // 创建 source 元素
+          const source = document.createElement('source');
+          source.src = video.dataset.src;
+          source.type = 'video/mp4';
+          
+          // 添加到视频元素
+          video.appendChild(source);
+          
+          // 监听鼠标悬停事件
+          video.closest('.group').addEventListener('mouseenter', () => {
+            if (video.paused) {
+              video.load();
+              video.play().catch(e => console.log('视频自动播放失败:', e));
+            }
+          });
+          
+          // 停止观察此元素
+          observer.unobserve(video);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '100px'
+    });
+    
+    // 开始观察所有视频
+    videos.forEach(video => {
+      observer.observe(video);
+    });
+  }
+
+  // 注册Service Worker实现缓存
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').then(function(registration) {
+        console.log('ServiceWorker注册成功: ', registration.scope);
+      }, function(err) {
+        console.log('ServiceWorker注册失败: ', err);
+      });
+    });
+  }
+
+  // 页面加载后预加载所有图片资源
+  function preloadImages() {
+    // 获取所有需要预加载的图片URL
+    const imageUrls = [
+      './assets/images/amiam_pic1.png',
+      './assets/images/Reminisce_pic1.png',
+      './assets/images/Paradise_pic1.png',
+      './assets/images/Mirage_pic1.png',
+      './assets/images/room_PIC1.png'
+    ];
+    
+    // 在用户开始浏览网站10秒后，开始预加载其他图片
+    setTimeout(() => {
+      imageUrls.forEach(url => {
+        const img = new Image();
+        img.src = url;
+      });
+      console.log('后台图片预加载完成');
+    }, 10000);
+  }
+  
+  // 页面加载完成后执行
+  document.addEventListener('DOMContentLoaded', function() {
+    setupVideoLazyLoading();
+    preloadImages();
+  });
+  
+  // 添加图片尺寸压缩提示
+  console.log('提示: 如需进一步优化加载速度，可将图片压缩至适当分辨率，推荐宽度不超过1200px');
 
 </script>
 
