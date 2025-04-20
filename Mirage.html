@@ -326,24 +326,20 @@
     });
   }
 
-  // 滚动到内容区域
   function scrollToContent() {
     document.getElementById('content').scrollIntoView({ behavior: 'smooth' });
   }
 
-  // 监听滚动事件
   window.addEventListener('scroll', () => {
     const nav = document.querySelector('.nav-container');
     const scrollIndicator = document.querySelector('.scroll-indicator');
     
-    // 导航栏背景透明度
     if (window.scrollY > 50) {
       nav.classList.add('scrolled');
     } else {
       nav.classList.remove('scrolled');
     }
 
-    // 隐藏/显示滚动指示器
     if (window.scrollY > 100) {
       scrollIndicator.classList.add('hidden');
     } else {
