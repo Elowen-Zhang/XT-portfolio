@@ -4,14 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Elowen – WEB</title>
-  
-  <!-- 预加载关键CSS资源 -->
   <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
-  
-  <!-- 预加载首屏图片 -->
   <link rel="preload" href="./assets/images/Variation_pic1.png" as="image" media="(min-width: 768px)">
-  
-  <!-- PWA缓存支持 -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0a0a0a">
   
@@ -70,7 +64,6 @@
       pointer-events: none;
     }
     
-    /* 高级背景动画 */
     .hero-background {
       position: absolute;
       top: 0;
@@ -141,7 +134,6 @@
       }
     }
     
-    /* 流星撞击波纹效果 */
     .ripple {
       position: absolute;
       border-radius: 50%;
@@ -164,32 +156,29 @@
       }
     }
     
-    /* 视频播放相关样式 */
     .group {
       position: relative;
     }
     
     video {
       transition: opacity 0.5s ease;
-      opacity: 0; /* 默认隐藏视频 */
+      opacity: 0; 
     }
     
     .group img {
       transition: opacity 0.5s ease;
-      opacity: 1; /* 确保图片始终显示 */
-      z-index: 1; /* 图片始终在上层 */
+      opacity: 1; 
+      z-index: 1; 
     }
     
-    /* 改变鼠标指针为指示可点击 */
     .group:hover {
       cursor: pointer;
     }
     
-    /* 优化视频播放按钮显示效果 */
     .play-button {
       opacity: 0;
       transition: opacity 0.3s ease, transform 0.3s ease;
-      z-index: 10; /* 确保按钮在最上层 */
+      z-index: 10; 
     }
     
     .group:hover .play-button {
@@ -202,7 +191,6 @@
       background-color: rgba(59,130,246,0.7);
     }
     
-    /* 加载指示器样式 */
     .loading-indicator {
       position: absolute;
       top: 50%;
@@ -222,12 +210,10 @@
       to { transform: translate(-50%, -50%) rotate(360deg); }
     }
     
-    /* 确保视频容器样式正确 */
     .relative.group.overflow-hidden.rounded-xl {
       background-color: #111;
     }
     
-    /* 设置视频容器位置 */
     .video-container-wrapper {
       position: relative;
     }
@@ -461,7 +447,6 @@
 
 <!-- Scripts -->
 <script>
-  // 鼠标光点跟随效果
   const glow = document.getElementById("cursor-glow");
   const heroBackground = document.querySelector(".hero-background");
   const heroCircles = document.querySelectorAll(".hero-circle");
@@ -470,32 +455,26 @@
   let mouseX = 0;
   let mouseY = 0;
   
-  // 减少鼠标移动时的粒子生成率
   document.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
     
-    // 降低移动时的粒子产生概率
     if (Math.random() < 0.2) {
       createShooting();
     }
     
-    // 更新首页背景 - 只在首屏才交互
     const heroSection = document.querySelector(".hero-background");
     if (heroSection && isElementInViewport(heroSection)) {
-      // 计算鼠标在屏幕上的相对位置 (0-1)
       const relX = mouseX / window.innerWidth;
       const relY = mouseY / window.innerHeight;
       
-      // 创建微妙的移动效果 - 根据鼠标位置
       heroCircles.forEach((circle, index) => {
-        // 随机移动方向基于索引
+        
         const moveX = (relX - 0.5) * 20 * (index % 2 === 0 ? 1 : -1);
         const moveY = (relY - 0.5) * 20 * (index % 2 === 0 ? -1 : 1);
         circle.style.transform = `translate(${moveX}px, ${moveY}px)`;
       });
       
-      // 调整网格线的不透明度
       heroLines.style.opacity = 0.5 + (relY * 0.4);
     }
   });
@@ -510,19 +489,16 @@
     );
   }
   
-  // 创建流星散射效果
+
   function createShooting() {
-    // 创建流星粒子
     const particle = document.createElement('div');
     const trail = document.createElement('div');
     
-    // 随机角度和距离
     const angle = Math.random() * Math.PI * 2;
     const distance = Math.random() * 120 + 60;
     const duration = Math.random() * 1000 + 400;
     const size = Math.random() * 4 + 2;
     
-    // 设置粒子样式
     particle.className = 'glow-particles';
     trail.className = 'glow-trail';
     
@@ -532,47 +508,39 @@
     trail.style.width = `${distance/2}px`;
     trail.style.height = `${size/1.5}px`;
     
-    // 添加到DOM
     glow.appendChild(particle);
     glow.appendChild(trail);
     
-    // 设置初始位置 - 使用当前鼠标位置
     const x = mouseX;
     const y = mouseY;
     
-    // 创建撞击波纹
     if (Math.random() < 0.3 && heroBackground && isElementInViewport(heroBackground)) {
       setTimeout(() => {
         createRipple(x + Math.cos(angle) * distance, y + Math.sin(angle) * distance, size * 10);
       }, duration);
     }
     
-    // 动画时间
     let startTime = null;
     
-    // 动画函数
     function animate(timestamp) {
       if (!startTime) startTime = timestamp;
       const progress = (timestamp - startTime) / duration;
       
       if (progress < 1) {
-        // 计算当前位置
         const currentDistance = distance * progress;
         const moveX = Math.cos(angle) * currentDistance;
         const moveY = Math.sin(angle) * currentDistance;
         
-        // 应用位置和透明度
         particle.style.transform = `translate(${x + moveX}px, ${y + moveY}px)`;
         particle.style.opacity = 1 - progress;
         
-        // 设置拖尾
         trail.style.width = `${currentDistance}px`;
         trail.style.transform = `translate(${x}px, ${y}px) rotate(${angle * (180/Math.PI)}deg)`;
         trail.style.opacity = (1 - progress) * 0.8;
         
         requestAnimationFrame(animate);
       } else {
-        // 移除元素
+        
         particle.remove();
         trail.remove();
       }
@@ -581,9 +549,7 @@
     requestAnimationFrame(animate);
   }
   
-  // 创建波纹效果
   function createRipple(x, y, size) {
-    // 检查是否在首屏
     if (!isElementInViewport(heroBackground)) return;
     
     const ripple = document.createElement('div');
@@ -595,20 +561,17 @@
     
     document.body.appendChild(ripple);
     
-    // 波纹结束后移除
     setTimeout(() => {
       ripple.remove();
     }, 1500);
     
-    // 微调背景圆形
     heroCircles.forEach(circle => {
-      // 随机调整亮度
       circle.style.opacity = 0.3 + (Math.random() * 0.2);
     });
   }
   
   function animateGlow() {
-    // 降低随机创建流星效果的概率 (静止时的产生概率)
+    
     if (Math.random() < 0.02) {
       createShooting();
     }
@@ -624,7 +587,6 @@
   canvas.height = window.innerHeight;
 
   let particlesArray = [];
-  // 减少粒子数量
   const maxParticles = 40;
 
   class Particle {
@@ -694,13 +656,10 @@
     });
   }
 
-  // 检测网络速度和用户偏好
   let isSlowConnection = false;
   let userPreferenceNoVideo = false;
   
-  // 检测网络条件
   function checkNetworkCondition() {
-    // 检查navigator.connection (仅在某些浏览器中可用)
     if (navigator.connection) {
       const connection = navigator.connection;
       if (connection.saveData || connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
@@ -710,7 +669,6 @@
       }
     }
     
-    // 使用超时检测方式
     const testConnection = async () => {
       try {
         const startTime = Date.now();
@@ -733,20 +691,15 @@
       }
     };
     
-    // 启动测试
     testConnection();
   }
   
-  // 完全改进视频懒加载
   function setupVideoLazyLoading() {
-    // 执行网络检测
     checkNetworkCondition();
     
-    // 获取所有视频元素
     const videos = document.querySelectorAll('video[data-src]');
     const videoContainers = document.querySelectorAll('.group');
     
-    // 创建速度选择开关
     const speedToggle = document.createElement('div');
     speedToggle.className = 'speed-toggle';
     speedToggle.innerHTML = `
@@ -769,7 +722,6 @@
     `;
     document.body.appendChild(speedToggle);
     
-    // 监听开关事件
     const toggleButton = document.getElementById('video-mode-toggle');
     if (toggleButton) {
       toggleButton.addEventListener('click', () => {
@@ -778,15 +730,14 @@
           <span data-lang="en">视频模式: ${userPreferenceNoVideo ? '关' : '开'}</span>
           <span data-lang="zh" class="hidden">视频模式: ${userPreferenceNoVideo ? '关' : '开'}</span>
         `;
-        // 根据当前显示语言显示对应文本
+
         const currentLang = document.querySelector('button[onclick="setLang(\'en\')"]').classList.contains('active') ? 'en' : 'zh';
         setLang(currentLang);
       });
     }
     
-    // 添加播放视频按钮到每个视频容器
+
     videoContainers.forEach(container => {
-      // 创建加载指示器
       const loadingIndicator = container.querySelector('.loading-indicator');
       
       const playButton = document.createElement('div');
@@ -806,12 +757,10 @@
       `;
       container.appendChild(playButton);
       
-      // 鼠标悬停时显示播放按钮
+
       container.addEventListener('mouseenter', () => {
-        // 如果用户选择不加载视频，则不显示播放按钮
         if (userPreferenceNoVideo) return;
         
-        // 只有在视频未加载或暂停时显示播放按钮
         const video = container.querySelector('video');
         if (!video.hasAttribute('src') || video.paused) {
           playButton.style.opacity = '1';
@@ -823,7 +772,6 @@
       });
     });
     
-    // 处理所有视频懒加载
     videos.forEach(video => {
       const container = video.closest('.group');
       const playButton = container.querySelector('.play-button');
@@ -831,51 +779,36 @@
       const img = container.querySelector('img');
       
       if (playButton) {
-        // 点击播放按钮或图片区域时加载并播放视频
         const handleClick = () => {
-          // 如果用户选择不加载视频，直接返回
           if (userPreferenceNoVideo) {
             alert('您已开启静态图片模式。如需观看视频，请切换视频模式为"开"。');
             return;
           }
           
           if (!video.hasAttribute('src')) {
-            // 显示加载指示器
             loadingIndicator.style.display = 'block';
             playButton.style.opacity = '0';
             
-            // 创建source元素
             const source = document.createElement('source');
             source.src = video.dataset.src;
             source.type = 'video/mp4';
             
-            // 添加到视频元素
             video.appendChild(source);
             video.load();
             
-            // 监听视频加载完成事件
             video.addEventListener('loadeddata', () => {
-              // 隐藏加载指示器
               loadingIndicator.style.display = 'none';
-              
-              // 显示视频
               video.style.opacity = '1';
-              
-              // 图片可以保持半透明作为背景
               if (img) img.style.opacity = '0.1';
-              
-              // 播放视频
               video.play().catch(e => console.log('视频自动播放失败:', e));
             });
             
-            // 监听视频加载错误
             video.addEventListener('error', () => {
               loadingIndicator.style.display = 'none';
               playButton.style.opacity = '1';
               alert('视频加载失败，请检查网络连接或稍后重试。');
             });
             
-            // 如果加载超过8秒仍未完成，隐藏加载指示器，显示错误信息
             setTimeout(() => {
               if (video.readyState < 3) { // 视频未加载完成
                 loadingIndicator.style.display = 'none';
@@ -884,7 +817,6 @@
               }
             }, 8000);
           } else {
-            // 如果已加载，则切换播放/暂停
             if (video.paused) {
               video.play();
               playButton.style.opacity = '0';
@@ -897,16 +829,14 @@
         
         playButton.addEventListener('click', handleClick);
         
-        // 也可以点击图片区域播放
         img.addEventListener('click', handleClick);
       }
     });
     
-    // IntersectionObserver观察视频容器是否进入视口
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          // 只有进入视口才显示播放按钮
           const container = entry.target;
           const playButton = container.querySelector('.play-button');
           if (playButton && !userPreferenceNoVideo) {
@@ -918,7 +848,6 @@
             });
           }
           
-          // 停止观察已进入视口的容器
           observer.unobserve(container);
         }
       });
@@ -927,16 +856,13 @@
       rootMargin: '100px'
     });
     
-    // 开始观察所有视频容器
     videoContainers.forEach(container => {
       observer.observe(container);
     });
   }
   
-  // 注册Service Worker实现缓存 - 修复路径问题
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-      // 获取当前站点的基本路径
       const basePath = window.location.pathname.replace(/\/[^\/]*$/, '/');
       navigator.serviceWorker.register(basePath + 'sw.js').then(function(registration) {
         console.log('ServiceWorker注册成功: ', registration.scope);
@@ -946,9 +872,7 @@
     });
   }
 
-  // 页面加载后预加载所有图片资源
   function preloadImages() {
-    // 获取所有需要预加载的图片URL
     const imageUrls = [
       './assets/images/amiam_pic1.png',
       './assets/images/Reminisce_pic1.png',
@@ -957,7 +881,6 @@
       './assets/images/room_PIC1.png'
     ];
     
-    // 在用户开始浏览网站10秒后，开始预加载其他图片
     setTimeout(() => {
       imageUrls.forEach(url => {
         const img = new Image();
@@ -967,13 +890,13 @@
     }, 10000);
   }
   
-  // 页面加载完成后执行
+
   document.addEventListener('DOMContentLoaded', function() {
     setupVideoLazyLoading();
     preloadImages();
   });
+
   
-  // 添加图片尺寸压缩提示
   console.log('提示: 如需进一步优化加载速度，可将图片压缩至适当分辨率，推荐宽度不超过1200px');
 
   function showEmail(event) {
@@ -983,7 +906,6 @@
     const spans = emailLink.querySelectorAll('span');
     
     if (emailText.classList.contains('hidden')) {
-      // 显示邮箱地址
       emailText.classList.remove('hidden');
       spans.forEach(span => {
         if (span.id !== 'email-text') {
@@ -991,7 +913,6 @@
         }
       });
       
-      // 复制到剪贴板
       const email = 'elowen_zhang@163.com';
       navigator.clipboard.writeText(email).then(() => {
         console.log('邮箱已复制到剪贴板');
@@ -999,7 +920,6 @@
         console.error('复制失败: ', err);
       });
       
-      // 3秒后恢复原状
       setTimeout(() => {
         emailText.classList.add('hidden');
         spans.forEach(span => {
