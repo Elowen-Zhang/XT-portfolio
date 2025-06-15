@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mirage – Project</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src='//player.polyv.net/resp/vod-player/latest/player.js'></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap">
+  <style>
+    html { 
+      scroll-behavior: smooth;
+      background: 
+        linear-gradient(180deg, #000000 0%, #0a0a0f 50%, #000000 100%),
+        radial-gradient(ellipse at 50% 0%, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
+    }
+    
+    body {
+      color: white;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+      background: 
+        radial-gradient(600px circle at 0% 0%, rgba(147, 51, 234, 0.1), transparent 40%),
+        radial-gradient(600px circle at 100% 100%, rgba(59, 130, 246, 0.05), transparent 40%);
+    }
+
+    .navigation-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+      backdrop-filter: blur(20px);
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    .lang-switcher {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      z-index: 51;
+      display: flex;
+      border-radius: 8px;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(147, 51, 234, 0.2);
+      background: rgba(0, 0, 0, 0.6);
+      transition: all 0.3s ease;
+      pointer-events: auto;
+    }
+
+    .lang-switcher button {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      border: none;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .lang-switcher button:hover {
+      background: rgba(147, 51, 234, 0.1);
+      color: #ffffff;
+    }
+
+    .lang-switcher button.active {
+      background: rgba(147, 51, 234, 0.3);
+      color: #ffffff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .back-link {
+      position: fixed;
+      top: 2rem;
+      left: 2rem;
+      z-index: 51;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.75rem;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid rgba(147, 51, 234, 0.2);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+      font-family: 'Orbitron', sans-serif;
+      pointer-events: auto;
+    }
+
+    .back-link:hover {
+      background: rgba(147, 51, 234, 0.2);
+      border-color: rgba(147, 51, 234, 0.4);
+      color: #ffffff;
+      transform: translateX(-4px);
+      box-shadow: 0 4px 20px rgba(147, 51, 234, 0.3);
+    }
+
+    .project-header {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .video-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      background: #000;
+      border-radius: 0 0 32px 32px;
+      overflow: hidden;
+    }
+
+    .video-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(180deg, 
+          rgba(0,0,0,0.1) 0%, 
+          rgba(0,0,0,0.3) 40%,
+          rgba(0,0,0,0.7) 80%,
+          rgba(0,0,0,0.9) 100%
+        ),
+        radial-gradient(ellipse at center bottom, rgba(147, 51, 234, 0.1) 0%, transparent 70%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .project-title {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 2rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s ease-out forwards;
+    }
+
+    .project-title h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: clamp(3rem, 8vw, 7rem);
+      line-height: 0.9;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+      
+      background: linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #f0f0f0 20%,
+        #e0aaff 60%,
+        #9d4edd 100%
+      );
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      
+      filter: drop-shadow(0 0 20px rgba(147, 51, 234, 0.5));
+      text-shadow: 0 0 40px rgba(147, 51, 234, 0.3);
+    }
+
+    .project-title p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      opacity: 0.9;
+      font-family: 'Orbitron', sans-serif;
+      margin-bottom: 0;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      cursor: pointer;
+      color: rgba(147, 51, 234, 0.8);
+    }
+
+    .scroll-indicator.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .scroll-indicator svg {
+      animation: bounce 2s infinite;
+      filter: drop-shadow(0 2px 8px rgba(147, 51, 234, 0.5));
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-20px); }
+      60% { transform: translateY(-10px); }
+    }
+
+    .content-section {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease-out;
+    }
+
+    .content-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .video-links {
+      position: absolute;
+      bottom: 3rem;
+      right: 3rem;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s ease-out 0.7s forwards;
+    }
+
+    .video-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(147, 51, 234, 0.3);
+      border-radius: 12px;
+      color: white;
+      text-decoration: none;
+      font-size: 0.75rem;
+      transition: all 0.4s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+      font-family: 'Orbitron', sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .video-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(147, 51, 234, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .video-link:hover::before {
+      left: 100%;
+    }
+
+    .video-link:hover {
+      background: rgba(147, 51, 234, 0.2);
+      border-color: rgba(147, 51, 234, 0.6);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(147, 51, 234, 0.4);
+    }
+
+    .video-link svg {
+      width: 1.125rem;
+      height: 1.125rem;
+      transition: transform 0.3s ease;
+      z-index: 1;
+    }
+
+    .video-link:hover svg {
+      transform: translateX(4px);
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .video-wrapper iframe,
+    .video-wrapper #plv_ga697f2e89a41a3354f4ae440622cde1_g {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .play-hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(147, 51, 234, 0.4);
+      border-radius: 16px;
+      padding: 2rem;
+      color: white;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .play-hint.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .play-hint:hover {
+      background: rgba(147, 51, 234, 0.2);
+      border-color: rgba(147, 51, 234, 0.6);
+      transform: translate(-50%, -50%) scale(1.05);
+      box-shadow: 0 12px 40px rgba(147, 51, 234, 0.4);
+    }
+
+    .play-hint .play-icon {
+      width: 4rem;
+      height: 4rem;
+      margin: 0 auto 1rem;
+      border: 2px solid rgba(147, 51, 234, 0.8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .play-hint:hover .play-icon {
+      border-color: rgba(147, 51, 234, 1);
+      background: rgba(147, 51, 234, 0.2);
+    }
+
+    .play-hint .play-icon svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      color: rgba(147, 51, 234, 0.9);
+      margin-left: 0.25rem;
+    }
+
+    .play-hint h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #ffffff;
+    }
+
+    .play-hint p {
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.8);
+      margin: 0;
+    }
+
+    .content-container {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(20px);
+      border-radius: 32px 32px 0 0;
+      margin-top: -16px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .info-section {
+      padding: 0;
+      margin-bottom: 3rem;
+    }
+
+    .info-section h2 {
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-family: 'Orbitron', sans-serif;
+      position: relative;
+    }
+
+    .info-section h2::after {
+      content: '';
+      position: absolute;
+      bottom: -0.5rem;
+      left: 0;
+      width: 3rem;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(147, 51, 234, 0.8), transparent);
+    }
+
+    .info-section p, .info-section li {
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .content-text {
+      padding: 0;
+      margin-bottom: 2rem;
+    }
+
+    .content-text p {
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.8;
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .content-text p.text-xl {
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 1.4rem;
+      margin-bottom: 2rem;
+    }
+
+    .content-text p em {
+      color: rgba(147, 51, 234, 1);
+      font-style: italic;
+      font-weight: 500;
+    }
+
+    footer {
+      border-top: 1px solid rgba(147, 51, 234, 0.2);
+      background: 
+        linear-gradient(135deg, rgba(147, 51, 234, 0.05) 0%, rgba(59, 130, 246, 0.03) 100%),
+        rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+      position: relative;
+    }
+
+    footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(147, 51, 234, 0.4), transparent);
+    }
+
+    footer p {
+      color: rgba(255, 255, 255, 0.6);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 768px) {
+      .navigation-overlay {
+        height: 60px;
+      }
+
+      .video-links {
+        bottom: 2rem;
+        right: 1.5rem;
+        gap: 0.75rem;
+      }
+
+      .video-link {
+        padding: 0.75rem 1rem;
+        font-size: 0.65rem;
+        border-radius: 8px;
+      }
+
+      .lang-switcher,
+      .back-link {
+        top: 1.5rem;
+        font-size: 0.65rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+      }
+
+      .lang-switcher {
+        right: 1.5rem;
+      }
+
+      .back-link {
+        left: 1.5rem;
+      }
+
+      .project-title h1 {
+        font-size: clamp(2.5rem, 8vw, 5rem);
+      }
+
+      .video-container {
+        border-radius: 0 0 20px 20px;
+      }
+
+      .content-container {
+        border-radius: 20px 20px 0 0;
+        margin-top: -10px;
+      }
+
+      .info-section {
+        margin-bottom: 2.5rem;
+      }
+
+      .info-section h2 {
+        font-size: 1.25rem;
+      }
+
+      .content-text p {
+        font-size: 1rem;
+      }
+
+      .content-text p.text-xl {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="navigation-overlay"></div>
+
+<div class="lang-switcher">
+  <button onclick="setLang('en')" class="active" id="btn-en">EN</button>
+  <button onclick="setLang('zh')" id="btn-zh">中</button>
+</div>
+
+<a href="index.html" class="back-link">
+  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+  </svg>
+  <span data-lang="en">Back</span>
+  <span class="hidden" data-lang="zh">返回</span>
+</a>
+
+<div class="project-header">
+  <div class="video-container">
+    <div class="video-wrapper">
+      <div id='plv_ga697f2e89a41a3354f4ae440622cde1_g'></div>
+    </div>
+    <div class="video-overlay"></div>
+    <div class="play-hint" id="playHint">
+      <div class="play-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <h3 data-lang="en">Click to Play Video</h3>
+      <h3 class="hidden" data-lang="zh">点击播放视频</h3>
+      <p data-lang="en">Experience the immersive world of Mirage</p>
+      <p class="hidden" data-lang="zh">体验沉浸式的虚壤世界</p>
+    </div>
+  </div>
+  <div class="project-title">
+    <h1 data-lang="en">Mirage</h1>
+    <h1 class="hidden" data-lang="zh">虚壤</h1>
+    <p data-lang="en">2024 · Interaction / Nature</p>
+    <p class="hidden" data-lang="zh">2024 · 交互 / 自然</p>
+  </div>
+  <div class="scroll-indicator" onclick="scrollToContent()">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+    </svg>
+  </div>
+  <div class="video-links">
+    <a href="https://youtu.be/Ff9DY2H8-JM?si=3Vasa3GojJfY6Xuv" target="_blank" class="video-link">
+      <span data-lang="en">Watch on YouTube</span>
+      <span class="hidden" data-lang="zh">在 YouTube 上观看</span>
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+      </svg>
+    </a>
+  </div>
+</div>
+
+<div class="content-container">
+<section class="max-w-4xl mx-auto px-6 pt-24 pb-16" id="content">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
+    <div class="content-section info-section">
+      <h2 data-lang="en">Project Overview</h2>
+      <h2 class="hidden" data-lang="zh">项目概述</h2>
+      <p data-lang="en">A sacred interactive ritual that bridges the mortal realm with the ethereal. Through Kinect motion tracking and TouchDesigner, participants become vessels of divine transformation, their movements manifesting as celestial butterflies in a realm between light and shadow.</p>
+      <p class="hidden" data-lang="zh">一场连接凡世与虚空的圣洁仪式。通过Kinect动作追踪与TouchDesigner，参与者成为神圣转化的容器，他们的动作在光与影的界域中化作天界蝴蝶。</p>
+    </div>
+    <div class="content-section info-section">
+      <h2 data-lang="en">Technical Details</h2>
+      <h2 class="hidden" data-lang="zh">技术细节</h2>
+      <ul class="space-y-2" data-lang="en">
+        <li>Hardware: Kinect v2</li>
+        <li>Software: TouchDesigner, UE5</li>
+        <li>Year: 2024</li>
+      </ul>
+      <ul class="space-y-2 hidden" data-lang="zh">
+        <li>硬件：Kinect v2</li>
+        <li>软件：TouchDesigner, UE5</li>
+        <li>年份：2024</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="max-w-3xl mx-auto px-6 space-y-6 pb-16">
+  <!-- EN -->
+  <div class="space-y-8 content-section content-text" data-lang="en">
+    <p class="text-xl leading-relaxed">In the void between realms, where light and shadow dance as one.</p>
+    <p class="text-gray-300">O sacred butterfly, guide us through the veil of existence.</p>
+    <p class="text-gray-300">In the depths of the void, life stirs from eternal slumber.</p>
+    <p class="text-gray-300">Through the ancient forest, whispers of forgotten gods echo.</p>
+    <p class="text-gray-300">In the sacred grove, the future takes root in divine soil.</p>
+    <p class="text-xl italic mt-8"><em>Behold, the Mirage awakens, and the cycle begins anew.</em></p>
+  </div>
+
+  <!-- ZH -->
+  <div class="space-y-8 content-section content-text hidden" data-lang="zh">
+    <p class="text-xl leading-relaxed">在诸界之间的虚空，光与影共舞。</p>
+    <p class="text-gray-300">神圣的蝴蝶啊，引领我们穿越存在的帷幕。</p>
+    <p class="text-gray-300">在虚空的深处，生命从永恒的沉睡中苏醒。</p>
+    <p class="text-gray-300">穿过古老的森林，被遗忘神祇的低语回响。</p>
+    <p class="text-gray-300">在圣洁的林中，未来在神圣的土壤中生根。</p>
+    <p class="text-xl italic mt-8"><em>看啊，幻象苏醒，轮回重新开始。</em></p>
+  </div>
+</section>
+</div>
+
+<footer class="text-center text-sm text-gray-500 py-8">
+  <p data-lang="en">Designed by Elowen · ©2025</p>
+  <p class="hidden" data-lang="zh">由Elowen设计 · ©2025</p>
+</footer>
+
+<script>
+  /**
+   * 设置语言显示
+   * @param {string} lang - 语言代码 ('en' 或 'zh')
+   */
+  function setLang(lang) {
+    // 切换所有带有 data-lang 属性的元素
+    document.querySelectorAll('[data-lang]').forEach(el => {
+      if (el.getAttribute('data-lang') === lang) {
+        el.classList.remove('hidden');
+        el.style.display = 'block';
+      } else {
+        el.classList.add('hidden');
+        el.style.display = 'none';
+      }
+    });
+    
+    // 更新语言切换按钮的激活状态
+    document.querySelectorAll('.lang-switcher button').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    
+    if (lang === 'en') {
+      document.getElementById('btn-en').classList.add('active');
+    } else {
+      document.getElementById('btn-zh').classList.add('active');
+    }
+  }
+
+  /**
+   * 滚动到内容区域
+   */
+  function scrollToContent() {
+    document.getElementById('content').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // 监听滚动事件，控制滚动指示器的显示
+  window.addEventListener('scroll', () => {
+    const scrollIndicator = document.querySelector('.scroll-indicator');
+    
+    if (window.scrollY > 100) {
+      scrollIndicator.classList.add('hidden');
+    } else {
+      scrollIndicator.classList.remove('hidden');
+    }
+  });
+
+  // 内容区域渐入动画观察器
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, {
+    threshold: 0.1
+  });
+
+  // 观察所有内容区域
+  document.querySelectorAll('.content-section').forEach(section => {
+    observer.observe(section);
+  });
+
+  // 默认显示英文
+  setLang('en');
+
+  // 全局播放器实例
+  let globalPlayer = null;
+  let playAttempts = 0;
+  const maxPlayAttempts = 20;
+  let isVideoPlaying = false;
+  let playHintTimeout = null;
+  let isMutedForAutoplay = false;
+  let hasUserInteracted = false;
+
+  /**
+   * 显示播放提示
+   */
+  function showPlayHint() {
+    const playHint = document.getElementById('playHint');
+    if (playHint && !isVideoPlaying) {
+      // 延迟显示，给自动播放更多时间
+      clearTimeout(playHintTimeout);
+      playHintTimeout = setTimeout(() => {
+        if (!isVideoPlaying) {
+          playHint.classList.add('visible');
+          console.log('显示播放提示');
+        }
+      }, 3000); // 3秒后显示提示
+    }
+  }
+
+  /**
+   * 隐藏播放提示
+   */
+  function hidePlayHint() {
+    const playHint = document.getElementById('playHint');
+    if (playHint) {
+      playHint.classList.remove('visible');
+      clearTimeout(playHintTimeout);
+      console.log('隐藏播放提示');
+    }
+  }
+
+  /**
+   * 尝试有声音播放，失败则静音播放
+   * @param {string} context - 播放尝试的上下文
+   */
+  function attemptPlayWithSound(context) {
+    if (!globalPlayer || typeof globalPlayer.play !== 'function') {
+      console.log(`${context}: 播放器未准备好`);
+      return false;
+    }
+
+    console.log(`${context}: 尝试有声音播放`);
+    
+    try {
+      // 确保音量开启
+      if (globalPlayer.setVolume) {
+        globalPlayer.setVolume(0.8);
+      }
+      if (globalPlayer.setMuted) {
+        globalPlayer.setMuted(false);
+      }
+      
+      const result = globalPlayer.play();
+      
+      if (result && typeof result.then === 'function') {
+        result.then(() => {
+          console.log(`${context}: 有声音播放成功！`);
+          isVideoPlaying = true;
+          isMutedForAutoplay = false;
+          hidePlayHint();
+        }).catch(error => {
+          console.error(`${context}: 有声音播放失败，尝试静音播放:`, error);
+          attemptPlayMuted(`${context}-muted`);
+        });
+      } else {
+        console.log(`${context}: 有声音播放成功！`);
+        isVideoPlaying = true;
+        isMutedForAutoplay = false;
+        hidePlayHint();
+      }
+      return true;
+    } catch(error) {
+      console.error(`${context}: 有声音播放失败，尝试静音播放:`, error);
+      attemptPlayMuted(`${context}-muted`);
+      return false;
+    }
+  }
+
+  /**
+   * 静音播放
+   * @param {string} context - 播放尝试的上下文
+   */
+  function attemptPlayMuted(context) {
+    if (!globalPlayer || typeof globalPlayer.play !== 'function') {
+      return false;
+    }
+
+    console.log(`${context}: 尝试静音播放`);
+    
+    try {
+      // 设置静音
+      if (globalPlayer.setMuted) {
+        globalPlayer.setMuted(true);
+      }
+      if (globalPlayer.setVolume) {
+        globalPlayer.setVolume(0);
+      }
+      
+      const result = globalPlayer.play();
+      
+      if (result && typeof result.then === 'function') {
+        result.then(() => {
+          console.log(`${context}: 静音播放成功，等待用户交互后开启声音`);
+          isVideoPlaying = true;
+          isMutedForAutoplay = true;
+          hidePlayHint();
+        }).catch(error => {
+          console.error(`${context}: 静音播放也失败:`, error);
+          if (playAttempts < maxPlayAttempts) {
+            setTimeout(() => attemptPlay(`${context}-retry`), 1000);
+          } else {
+            showPlayHint();
+          }
+        });
+      } else {
+        console.log(`${context}: 静音播放成功，等待用户交互后开启声音`);
+        isVideoPlaying = true;
+        isMutedForAutoplay = true;
+        hidePlayHint();
+      }
+      return true;
+    } catch(error) {
+      console.error(`${context}: 静音播放失败:`, error);
+      return false;
+    }
+  }
+
+  /**
+   * 尝试播放视频
+   * @param {string} context - 播放尝试的上下文
+   */
+  function attemptPlay(context) {
+    if (!globalPlayer || typeof globalPlayer.play !== 'function') {
+      console.log(`${context}: 播放器未准备好`);
+      if (context === 'user-interaction' || context === 'click-hint') {
+        showPlayHint();
+      }
+      return false;
+    }
+
+    if (playAttempts >= maxPlayAttempts && context !== 'user-interaction' && context !== 'click-hint') {
+      console.log(`${context}: 已达到最大播放尝试次数`);
+      showPlayHint();
+      return false;
+    }
+
+    playAttempts++;
+    console.log(`${context}: 播放尝试 ${playAttempts}/${maxPlayAttempts}`);
+
+    // 如果已经有用户交互，或者是用户交互触发的，直接尝试有声音播放
+    if (hasUserInteracted || context.includes('user-') || context.includes('click-')) {
+      return attemptPlayWithSound(context);
+    } else {
+      // 否则先尝试有声音播放，失败则自动降级到静音播放
+      return attemptPlayWithSound(context);
+    }
+  }
+
+  /**
+   * 在用户交互后取消静音
+   */
+  function unmuteAfterInteraction() {
+    if (isMutedForAutoplay && globalPlayer && isVideoPlaying) {
+      console.log('用户已交互，取消静音');
+      try {
+        if (globalPlayer.setMuted) {
+          globalPlayer.setMuted(false);
+        }
+        if (globalPlayer.setVolume) {
+          globalPlayer.setVolume(0.8);
+        }
+        isMutedForAutoplay = false;
+      } catch(e) {
+        console.error('取消静音失败:', e);
+      }
+    }
+  }
+
+  /**
+   * 持续监控并尝试播放
+   */
+  function startPlaybackMonitor() {
+    const monitor = setInterval(() => {
+      if (!globalPlayer) return;
+
+      try {
+        // 检查播放器状态
+        const isPaused = globalPlayer.getPaused ? globalPlayer.getPaused() : true;
+        const isReady = globalPlayer.getReady ? globalPlayer.getReady() : false;
+
+        if (isPaused && isReady && playAttempts < maxPlayAttempts) {
+          attemptPlay('monitor');
+        }
+
+        // 如果播放成功或达到最大尝试次数，清除监控
+        if (!isPaused || playAttempts >= maxPlayAttempts) {
+          clearInterval(monitor);
+          console.log('播放监控已停止');
+        }
+      } catch(e) {
+        console.error('监控播放状态失败:', e);
+      }
+    }, 2000);
+
+    // 30秒后停止监控
+    setTimeout(() => {
+      clearInterval(monitor);
+      console.log('播放监控超时停止');
+    }, 30000);
+  }
+
+  // 等待DOM完全加载后初始化播放器
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('开始初始化保利威播放器...');
+    
+    // 检查保利威播放器是否加载
+    if (typeof polyvPlayer === 'undefined') {
+      console.error('保利威播放器脚本未加载');
+      return;
+    }
+    
+         // 初始化 polyv 播放器
+     globalPlayer = polyvPlayer({
+       'wrap':'#plv_ga697f2e89a41a3354f4ae440622cde1_g',
+       'width':'100%',
+       'height':'100%',
+       'vid': 'ga697f2e89a41a3354f4ae440622cde1_g',
+       'autoplay': 1, // 自动播放
+       'loop': 1, // 循环播放
+       'volume': 0.8, // 设置音量为80%
+       'controlBar': 0, // 隐藏控制栏
+       'logo': 0, // 隐藏logo
+       'playsafe': '',
+       'muted': false, // 不静音
+       'playsinline': true, // 在移动设备上内联播放
+       'webkit-playsinline': true,
+      
+             // 播放器事件回调
+       'onReady': function() {
+         console.log('播放器准备完成');
+         // 立即多次尝试播放
+         setTimeout(() => attemptPlay('onReady-1'), 0);
+         setTimeout(() => attemptPlay('onReady-2'), 100);
+         setTimeout(() => attemptPlay('onReady-3'), 300);
+         setTimeout(() => attemptPlay('onReady-4'), 500);
+         // 启动播放监控
+         startPlaybackMonitor();
+       },
+      
+             'onPlay': function() {
+         console.log('视频开始播放 - 成功！');
+         isVideoPlaying = true;
+         hidePlayHint();
+         playAttempts = maxPlayAttempts; // 停止进一步尝试
+       },
+       
+       'onPause': function() {
+         console.log('视频暂停，尝试重新播放...');
+         isVideoPlaying = false;
+         setTimeout(() => attemptPlay('onPause'), 500);
+       },
+      
+      'onError': function(error) {
+        console.error('播放器错误:', error);
+        setTimeout(() => attemptPlay('onError'), 2000);
+      },
+      
+      'onLoadStart': function() {
+        console.log('开始加载视频');
+      },
+      
+      'onCanPlay': function() {
+        console.log('视频可以播放');
+        attemptPlay('onCanPlay');
+      },
+
+      'onLoadedData': function() {
+        console.log('视频数据加载完成');
+        attemptPlay('onLoadedData');
+      },
+
+      'onLoadedMetadata': function() {
+        console.log('视频元数据加载完成');
+        attemptPlay('onLoadedMetadata');
+      }
+    });
+    
+         // 更密集的播放尝试
+     const timeouts = [100, 300, 500, 700, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 6000, 8000, 10000];
+     timeouts.forEach((delay, index) => {
+       setTimeout(() => {
+         attemptPlay(`timeout-${index + 1}`);
+       }, delay);
+     });
+
+     // 启动播放提示监控 - 只有在完全播放失败时才显示
+     setTimeout(() => {
+       if (!isVideoPlaying && !isMutedForAutoplay) {
+         showPlayHint();
+       }
+     }, 8000);
+     
+     // 将播放器暴露到全局，便于调试
+     window.debugPlayer = globalPlayer;
+     console.log('播放器实例已创建');
+   });
+
+  // 页面完全加载后尝试播放
+  window.addEventListener('load', function() {
+    console.log('页面完全加载');
+    setTimeout(() => attemptPlay('window-load'), 1000);
+  });
+  
+     // 播放提示点击事件
+   document.addEventListener('DOMContentLoaded', function() {
+     const playHint = document.getElementById('playHint');
+     if (playHint) {
+       playHint.addEventListener('click', function() {
+         hasUserInteracted = true;
+         console.log('用户点击播放提示');
+         attemptPlay('click-hint');
+         unmuteAfterInteraction();
+         hidePlayHint();
+       });
+     }
+   });
+
+   // 用户交互后尝试播放（鼠标移动、点击、触摸等）
+   const userInteractionEvents = ['click', 'touchstart', 'mousemove', 'keydown', 'mouseenter'];
+   userInteractionEvents.forEach(eventType => {
+     document.addEventListener(eventType, function() {
+       hasUserInteracted = true;
+       console.log(`用户交互: ${eventType}`);
+       attemptPlay(`user-${eventType}`);
+       unmuteAfterInteraction();
+     }, { once: true, passive: true });
+   });
+
+   // 视频容器点击事件
+   document.addEventListener('DOMContentLoaded', function() {
+     const videoContainer = document.querySelector('.video-container');
+     if (videoContainer) {
+       videoContainer.addEventListener('click', function() {
+         hasUserInteracted = true;
+         console.log('用户点击视频容器');
+         attemptPlay('video-container-click');
+         unmuteAfterInteraction();
+       });
+     }
+   });
+
+     // 页面获得焦点时尝试播放
+   window.addEventListener('focus', function() {
+     hasUserInteracted = true;
+     attemptPlay('window-focus');
+     unmuteAfterInteraction();
+   });
+
+   // 页面可见性变化时尝试播放
+   document.addEventListener('visibilitychange', function() {
+     if (!document.hidden) {
+       hasUserInteracted = true;
+       setTimeout(() => {
+         attemptPlay('visibility-change');
+         unmuteAfterInteraction();
+       }, 500);
+     }
+   });
+
+   // 滚动事件触发播放尝试
+   let scrollPlayAttempted = false;
+   window.addEventListener('scroll', function() {
+     if (!scrollPlayAttempted) {
+       scrollPlayAttempted = true;
+       hasUserInteracted = true;
+       attemptPlay('scroll');
+       unmuteAfterInteraction();
+     }
+   }, { once: true, passive: true });
+
+   // 强制播放策略 - 页面加载后持续尝试
+   setTimeout(function forcePlayStrategy() {
+     if (!isVideoPlaying && globalPlayer) {
+       console.log('执行强制播放策略...');
+       
+       // 尝试多种播放方法
+       try {
+         // 方法1: 直接调用play
+         globalPlayer.play();
+         
+         // 方法2: 设置autoplay属性
+         if (globalPlayer.setAutoplay) {
+           globalPlayer.setAutoplay(true);
+         }
+         
+         // 方法3: 重置播放器状态
+         if (globalPlayer.seek) {
+           globalPlayer.seek(0);
+           setTimeout(() => globalPlayer.play(), 100);
+         }
+         
+         // 方法4: 触发播放事件
+         if (globalPlayer.trigger) {
+           globalPlayer.trigger('play');
+         }
+         
+       } catch(e) {
+         console.error('强制播放失败:', e);
+       }
+       
+       // 如果还没播放，继续尝试
+       if (!isVideoPlaying) {
+         setTimeout(forcePlayStrategy, 2000);
+       }
+     }
+   }, 8000);
+
+   // 备用播放方案 - 使用原生视频元素方法
+   function fallbackPlayStrategy() {
+     if (!isVideoPlaying) {
+       console.log('尝试备用播放方案...');
+       const videoElements = document.querySelectorAll('video');
+       videoElements.forEach(video => {
+         try {
+           // 先尝试有声音播放
+           video.muted = false;
+           video.volume = 0.8;
+           video.autoplay = true;
+           video.loop = true;
+           video.play().then(() => {
+             console.log('备用方案有声音播放成功');
+             isVideoPlaying = true;
+             hidePlayHint();
+           }).catch(e => {
+             console.error('备用方案有声音播放失败，尝试静音:', e);
+             // 如果失败，尝试静音播放
+             video.muted = true;
+             video.volume = 0;
+             video.play().then(() => {
+               console.log('备用方案静音播放成功');
+               isVideoPlaying = true;
+               isMutedForAutoplay = true;
+               hidePlayHint();
+             }).catch(e2 => {
+               console.error('备用方案静音播放也失败:', e2);
+             });
+           });
+         } catch(e) {
+           console.error('备用方案执行失败:', e);
+         }
+       });
+     }
+   }
+   
+   // 12秒后尝试备用方案
+   setTimeout(fallbackPlayStrategy, 12000);
+</script>
+
+</body>
+</html>

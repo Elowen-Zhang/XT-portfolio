@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reminisce – Project</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src='//player.polyv.net/resp/vod-player/latest/player.js'></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap">
+  <style>
+    html { 
+      scroll-behavior: smooth;
+      background: 
+        linear-gradient(180deg, #000000 0%, #0a0a0f 50%, #000000 100%),
+        radial-gradient(ellipse at 50% 0%, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
+    }
+    
+    body {
+      color: white;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+      background: 
+        radial-gradient(600px circle at 0% 0%, rgba(147, 51, 234, 0.1), transparent 40%),
+        radial-gradient(600px circle at 100% 100%, rgba(59, 130, 246, 0.05), transparent 40%);
+    }
+
+    .navigation-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+      backdrop-filter: blur(20px);
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    .lang-switcher {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      z-index: 51;
+      display: flex;
+      border-radius: 8px;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(147, 51, 234, 0.2);
+      background: rgba(0, 0, 0, 0.6);
+      transition: all 0.3s ease;
+      pointer-events: auto;
+    }
+
+    .lang-switcher button {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      border: none;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .lang-switcher button:hover {
+      background: rgba(147, 51, 234, 0.1);
+      color: #ffffff;
+    }
+
+    .lang-switcher button.active {
+      background: rgba(147, 51, 234, 0.3);
+      color: #ffffff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .back-link {
+      position: fixed;
+      top: 2rem;
+      left: 2rem;
+      z-index: 51;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.75rem;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid rgba(147, 51, 234, 0.2);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+      font-family: 'Orbitron', sans-serif;
+      pointer-events: auto;
+    }
+
+    .back-link:hover {
+      background: rgba(147, 51, 234, 0.2);
+      border-color: rgba(147, 51, 234, 0.4);
+      color: #ffffff;
+      transform: translateX(-4px);
+      box-shadow: 0 4px 20px rgba(147, 51, 234, 0.3);
+    }
+
+    .project-header {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .video-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      background: #000;
+      border-radius: 0 0 32px 32px;
+      overflow: hidden;
+    }
+
+    .video-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(180deg, 
+          rgba(0,0,0,0.1) 0%, 
+          rgba(0,0,0,0.3) 40%,
+          rgba(0,0,0,0.7) 80%,
+          rgba(0,0,0,0.9) 100%
+        ),
+        radial-gradient(ellipse at center bottom, rgba(147, 51, 234, 0.1) 0%, transparent 70%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .project-title {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 2rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s ease-out forwards;
+    }
+
+    .project-title h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: clamp(3rem, 8vw, 7rem);
+      line-height: 0.9;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+      
+      background: linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #f0f0f0 20%,
+        #e0aaff 60%,
+        #9d4edd 100%
+      );
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      
+      filter: drop-shadow(0 0 20px rgba(147, 51, 234, 0.5));
+      text-shadow: 0 0 40px rgba(147, 51, 234, 0.3);
+    }
+
+    .project-title p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      opacity: 0.9;
+      font-family: 'Orbitron', sans-serif;
+      margin-bottom: 0;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      cursor: pointer;
+      color: rgba(147, 51, 234, 0.8);
+    }
+
+    .scroll-indicator.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .scroll-indicator svg {
+      animation: bounce 2s infinite;
+      filter: drop-shadow(0 2px 8px rgba(147, 51, 234, 0.5));
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-20px); }
+      60% { transform: translateY(-10px); }
+    }
+
+    .content-section {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease-out;
+    }
+
+    .content-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .video-links {
+      position: absolute;
+      bottom: 3rem;
+      right: 3rem;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s ease-out 0.7s forwards;
+    }
+
+    .video-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(147, 51, 234, 0.3);
+      border-radius: 12px;
+      color: white;
+      text-decoration: none;
+      font-size: 0.75rem;
+      transition: all 0.4s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+      font-family: 'Orbitron', sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .video-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(147, 51, 234, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .video-link:hover::before {
+      left: 100%;
+    }
+
+    .video-link:hover {
+      background: rgba(147, 51, 234, 0.2);
+      border-color: rgba(147, 51, 234, 0.6);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(147, 51, 234, 0.4);
+    }
+
+    .video-link svg {
+      width: 1.125rem;
+      height: 1.125rem;
+      transition: transform 0.3s ease;
+      z-index: 1;
+    }
+
+    .video-link:hover svg {
+      transform: translateX(4px);
+    }
+
+    .video-link.youku {
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .video-link.youku::before {
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent);
+    }
+
+    .video-link.youku:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: rgba(59, 130, 246, 0.6);
+      box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .video-wrapper iframe,
+    .video-wrapper #plv_ga697f2e89c93359166a38c3b928679e_g {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .content-container {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(20px);
+      border-radius: 32px 32px 0 0;
+      margin-top: -16px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .info-section {
+      padding: 0;
+      margin-bottom: 3rem;
+    }
+
+    .info-section h2 {
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-family: 'Orbitron', sans-serif;
+      position: relative;
+    }
+
+    .info-section h2::after {
+      content: '';
+      position: absolute;
+      bottom: -0.5rem;
+      left: 0;
+      width: 3rem;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(147, 51, 234, 0.8), transparent);
+    }
+
+    .info-section p, .info-section li {
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .content-text {
+      padding: 0;
+      margin-bottom: 2rem;
+    }
+
+    .content-text p {
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.8;
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .content-text p.text-xl {
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 1.4rem;
+      margin-bottom: 2rem;
+    }
+
+    .content-text p em {
+      color: rgba(147, 51, 234, 1);
+      font-style: italic;
+      font-weight: 500;
+    }
+
+    footer {
+      border-top: 1px solid rgba(147, 51, 234, 0.2);
+      background: 
+        linear-gradient(135deg, rgba(147, 51, 234, 0.05) 0%, rgba(59, 130, 246, 0.03) 100%),
+        rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+      position: relative;
+    }
+
+    footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(147, 51, 234, 0.4), transparent);
+    }
+
+    footer p {
+      color: rgba(255, 255, 255, 0.6);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 768px) {
+      .navigation-overlay {
+        height: 60px;
+      }
+
+      .video-links {
+        bottom: 2rem;
+        right: 1.5rem;
+        gap: 0.75rem;
+      }
+
+      .video-link {
+        padding: 0.75rem 1rem;
+        font-size: 0.65rem;
+        border-radius: 8px;
+      }
+
+      .lang-switcher,
+      .back-link {
+        top: 1.5rem;
+        font-size: 0.65rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+      }
+
+      .lang-switcher {
+        right: 1.5rem;
+      }
+
+      .back-link {
+        left: 1.5rem;
+      }
+
+      .project-title h1 {
+        font-size: clamp(2.5rem, 8vw, 5rem);
+      }
+
+      .video-container {
+        border-radius: 0 0 20px 20px;
+      }
+
+      .content-container {
+        border-radius: 20px 20px 0 0;
+        margin-top: -10px;
+      }
+
+      .info-section {
+        margin-bottom: 2.5rem;
+      }
+
+      .info-section h2 {
+        font-size: 1.25rem;
+      }
+
+      .content-text p {
+        font-size: 1rem;
+      }
+
+      .content-text p.text-xl {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="navigation-overlay"></div>
+
+<div class="lang-switcher">
+  <button onclick="setLang('en')" class="active" id="btn-en">EN</button>
+  <button onclick="setLang('zh')" id="btn-zh">中</button>
+</div>
+
+<a href="index.html" class="back-link">
+  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+  </svg>
+  <span data-lang="en">Back</span>
+  <span class="hidden" data-lang="zh">返回</span>
+</a>
+
+<div class="project-header">
+  <div class="video-container">
+    <div class="video-wrapper">
+      <div id='plv_ga697f2e89c93359166a38c3b928679e_g'></div>
+    </div>
+    <div class="video-overlay"></div>
+  </div>
+  <div class="project-title">
+    <h1 data-lang="en">Reminisce</h1>
+    <h1 class="hidden" data-lang="zh">明日之前</h1>
+    <p data-lang="en">2024 · Game / Interactive</p>
+    <p class="hidden" data-lang="zh">2024 · 游戏 / 交互</p>
+  </div>
+  <div class="scroll-indicator" onclick="scrollToContent()">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+    </svg>
+  </div>
+  <div class="video-links">
+    <a href="https://youtu.be/1mGAdtnFQ9U?si=p7dg6tdMqrW1bf7c" target="_blank" class="video-link">
+      <span data-lang="en">Watch on YouTube</span>
+      <span class="hidden" data-lang="zh">在 YouTube 上观看</span>
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+      </svg>
+    </a>
+  </div>
+</div>
+
+<div class="content-container">
+<section class="max-w-4xl mx-auto px-6 pt-24 pb-16" id="content">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
+    <div class="content-section info-section">
+      <h2 data-lang="en">Project Overview</h2>
+      <h2 class="hidden" data-lang="zh">项目概述</h2>
+      <p data-lang="en">A 3D story exploration game with non-linear narrative structure, where players explore the past through interactions with objects and scenes in an "old house".</p>
+      <p class="hidden" data-lang="zh">一款采用非线性叙事结构的3D探索游戏，玩家通过回到"老屋"探索过往，在物件与场景交互中，逐步揭示故事。</p>
+    </div>
+    <div class="content-section info-section">
+      <h2 data-lang="en">Technical Details</h2>
+      <h2 class="hidden" data-lang="zh">技术细节</h2>
+      <ul class="space-y-2" data-lang="en">
+        <li>Engine: Unity HDRP</li>
+        <li>Interaction: Kinect, TouchDesigner</li>
+        <li>Hardware: Arduino</li>
+        <li>Year: 2024</li>
+      </ul>
+      <ul class="space-y-2 hidden" data-lang="zh">
+        <li>引擎：Unity HDRP</li>
+        <li>交互：Kinect、TouchDesigner</li>
+        <li>硬件：Arduino</li>
+        <li>年份：2024</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="max-w-3xl mx-auto px-6 space-y-6 pb-16">
+  <!-- EN -->
+  <div class="space-y-8 content-section content-text" data-lang="en">
+    <p class="text-xl leading-relaxed">Before Tomorrow.</p>
+    <p class="text-gray-300">A journey through the corridors of consciousness, where each space holds fragments of what once was and what could be.</p>
+    <p class="text-gray-300">The boundaries between moments dissolve, creating a tapestry of experiences that transcend the linear flow of existence.</p>
+    <p class="text-gray-300">In this liminal space, the past whispers through the present, while the future echoes in the shadows of forgotten corners.</p>
+    <p class="text-gray-300">Each encounter reveals a new layer of understanding, each discovery a different perspective on the continuum of experience.</p>
+    <p class="text-gray-300">The title speaks of the threshold between what has been and what is yet to come, a space where meaning emerges from the interplay of moments.</p>
+    <p class="text-xl italic mt-8"><em>In the space between moments, truth awaits.</em></p>
+  </div>
+
+  <!-- ZH -->
+  <div class="space-y-8 content-section content-text hidden" data-lang="zh">
+    <p class="text-xl leading-relaxed">明日之前。</p>
+    <p class="text-gray-300">一段穿越意识长廊的旅程，每个空间都承载着已逝与可能的碎片。</p>
+    <p class="text-gray-300">时刻之间的界限消融，编织出一幅超越线性存在的体验图景。</p>
+    <p class="text-gray-300">在这个阈限空间中，过去在当下低语，未来在遗忘角落的阴影中回响。</p>
+    <p class="text-gray-300">每次相遇都揭示新的理解层面，每次发现都是对经验连续体的不同视角。</p>
+    <p class="text-gray-300">标题诉说着已逝与未至之间的门槛，一个意义从时刻交织中浮现的空间。</p>
+    <p class="text-xl italic mt-8"><em>在时刻之间，真相静待。</em></p>
+  </div>
+</section>
+</div>
+
+<footer class="text-center text-sm text-gray-500 py-8">
+  <p data-lang="en">Designed by Elowen · ©2025</p>
+  <p class="hidden" data-lang="zh">由Elowen设计 · ©2025</p>
+</footer>
+
+<script>
+  function setLang(lang) {
+    document.querySelectorAll('[data-lang]').forEach(el => {
+      if (el.getAttribute('data-lang') === lang) {
+        el.classList.remove('hidden');
+        el.style.display = 'block';
+      } else {
+        el.classList.add('hidden');
+        el.style.display = 'none';
+      }
+    });
+    
+    document.querySelectorAll('.lang-switcher button').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    
+    if (lang === 'en') {
+      document.getElementById('btn-en').classList.add('active');
+    } else {
+      document.getElementById('btn-zh').classList.add('active');
+    }
+  }
+
+  function scrollToContent() {
+    document.getElementById('content').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  window.addEventListener('scroll', () => {
+    const scrollIndicator = document.querySelector('.scroll-indicator');
+    
+    if (window.scrollY > 100) {
+      scrollIndicator.classList.add('hidden');
+    } else {
+      scrollIndicator.classList.remove('hidden');
+    }
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, {
+    threshold: 0.1
+  });
+
+  document.querySelectorAll('.content-section').forEach(section => {
+    observer.observe(section);
+  });
+
+  setLang('en');
+
+  /**
+   * 增强自动播放策略
+   * @description 页面加载完成后立即尝试多种方式启动视频播放
+   */
+  function enhancedAutoPlay() {
+    console.log('执行增强自动播放策略');
+    
+    // 策略1：直接播放
+    setTimeout(function() {
+      try {
+        if (player) {
+          player.j2s_resumeVideo();
+          player.play();
+          console.log('策略1：直接播放已执行');
+        }
+      } catch (e) {
+        console.log('策略1失败:', e);
+      }
+    }, 200);
+
+    // 策略2：设置音量后播放
+    setTimeout(function() {
+      try {
+        if (player) {
+          player.j2s_setVolume(50); // 设置音量为50%
+          player.j2s_resumeVideo();
+          player.play();
+          console.log('策略2：音量播放已执行');
+        }
+      } catch (e) {
+        console.log('策略2失败:', e);
+      }
+    }, 800);
+
+    // 策略3：模拟用户点击播放
+    setTimeout(function() {
+      try {
+        var videoElement = document.querySelector('#plv_ga697f2e89c93359166a38c3b928679e_g video');
+        if (videoElement) {
+          videoElement.muted = false;
+          videoElement.volume = 0.5;
+          videoElement.play();
+          console.log('策略3：HTML5视频播放已执行');
+        }
+        
+        if (player) {
+          player.j2s_resumeVideo();
+          player.play();
+          console.log('策略3：播放器播放已执行');
+        }
+      } catch (e) {
+        console.log('策略3失败:', e);
+      }
+    }, 1500);
+  }
+
+  // 页面完全加载后执行增强策略
+  if (document.readyState === 'complete') {
+    enhancedAutoPlay();
+  } else {
+    window.addEventListener('load', enhancedAutoPlay);
+  }
+
+  /**
+   * 初始化 Polyv 播放器并强制自动播放
+   * @description 使用最强制的方式确保视频进入页面后立即自动播放
+   */
+  var player = polyvPlayer({
+    'wrap':'#plv_ga697f2e89c93359166a38c3b928679e_g',
+    'width':'100%',
+    'height':'100%',
+    'vid': 'ga697f2e89c93359166a38c3b928679e_g',
+    'autoplay': true, // 自动播放
+    'loop': true, // 循环播放
+    'volume': 50, // 默认音量50%
+    'muted': false, // 开启声音
+    'preload': 'auto', // 预加载视频
+    'playsinline': true, // 移动端内联播放
+    'controls': false, // 隐藏控制条
+    'playsafe': '', // 播放加密视频的凭证
+    // 播放器事件回调
+    'onReady': function() {
+      console.log('播放器准备完成，开始播放');
+      // 播放器准备好后立即播放
+      setTimeout(function() {
+        try {
+          player.j2s_resumeVideo(); // 使用 Polyv 特定的播放方法
+          player.play();
+          console.log('onReady 中执行 play()');
+        } catch (e) {
+          console.log('onReady 播放失败:', e);
+        }
+      }, 100);
+    },
+    'onError': function(error) {
+      console.log('播放器错误:', error);
+    },
+    'onLoadedData': function() {
+      console.log('视频数据加载完成，尝试播放');
+      try {
+        player.play();
+      } catch (e) {
+        console.log('onLoadedData 播放失败:', e);
+      }
+    }
+  });
+
+  /**
+   * 多重播放保障机制
+   * @description 使用多种时机和方法确保视频能够自动播放
+   */
+  
+  // 立即尝试播放（播放器创建后）
+  setTimeout(function() {
+    console.log('立即尝试播放');
+    try {
+      if (player && player.play) {
+        player.j2s_resumeVideo(); // Polyv 特定方法
+        player.play();
+        console.log('立即播放命令已执行');
+      }
+    } catch (e) {
+      console.log('立即播放失败:', e);
+    }
+  }, 100);
+
+  // 0.5秒后再次尝试
+  setTimeout(function() {
+    console.log('0.5秒后尝试播放');
+    try {
+      if (player && player.play) {
+        player.j2s_resumeVideo();
+        player.play();
+        console.log('0.5秒后播放命令已执行');
+      }
+    } catch (e) {
+      console.log('0.5秒后播放失败:', e);
+    }
+  }, 500);
+
+  // 页面 DOM 加载完成后尝试
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM 加载完成，尝试播放');
+    setTimeout(function() {
+      try {
+        if (player && player.play) {
+          player.play();
+          console.log('DOMContentLoaded 播放命令已执行');
+        }
+      } catch (e) {
+        console.log('DOMContentLoaded 播放失败:', e);
+      }
+    }, 500);
+  });
+
+  // 页面完全加载后尝试
+  window.addEventListener('load', function() {
+    console.log('页面完全加载完成，尝试播放');
+    
+    // 1秒后尝试
+    setTimeout(function() {
+      try {
+        if (player && player.play) {
+          player.play();
+          console.log('load 事件 1秒后播放命令已执行');
+        }
+      } catch (e) {
+        console.log('load 事件 1秒后播放失败:', e);
+      }
+    }, 1000);
+
+    // 2秒后再次尝试
+    setTimeout(function() {
+      try {
+        if (player && player.play) {
+          player.play();
+          console.log('load 事件 2秒后播放命令已执行');
+        }
+      } catch (e) {
+        console.log('load 事件 2秒后播放失败:', e);
+      }
+    }, 2000);
+
+    // 3秒后最后尝试
+    setTimeout(function() {
+      try {
+        if (player && player.play) {
+          player.play();
+          console.log('load 事件 3秒后播放命令已执行');
+        }
+      } catch (e) {
+        console.log('load 事件 3秒后播放失败:', e);
+      }
+    }, 3000);
+  });
+
+  // 用户交互后立即播放（绕过浏览器自动播放限制）
+  ['click', 'touchstart', 'keydown', 'mousemove', 'scroll'].forEach(function(event) {
+    document.addEventListener(event, function() {
+      console.log('用户交互 (' + event + ')，尝试播放');
+      try {
+        if (player && player.play) {
+          player.j2s_resumeVideo();
+          player.play();
+          console.log('用户交互播放命令已执行');
+        }
+      } catch (e) {
+        console.log('用户交互播放失败:', e);
+      }
+    }, { once: true });
+  });
+
+  // 页面可见性变化时尝试播放
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+      console.log('页面变为可见，尝试播放');
+      setTimeout(function() {
+        try {
+          if (player && player.play) {
+            player.j2s_resumeVideo();
+            player.play();
+            console.log('页面可见时播放命令已执行');
+          }
+        } catch (e) {
+          console.log('页面可见时播放失败:', e);
+        }
+      }, 300);
+    }
+  });
+
+  // 窗口获得焦点时尝试播放
+  window.addEventListener('focus', function() {
+    console.log('窗口获得焦点，尝试播放');
+    setTimeout(function() {
+      try {
+        if (player && player.play) {
+          player.j2s_resumeVideo();
+          player.play();
+          console.log('窗口焦点播放命令已执行');
+        }
+      } catch (e) {
+        console.log('窗口焦点播放失败:', e);
+      }
+    }, 200);
+  });
+
+  // 存储播放器实例供调试使用
+  window.polyvPlayerInstance = player;
+  
+  // 调试信息
+  console.log('播放器实例已创建:', player);
+  console.log('当前页面地址:', window.location.href);
+  console.log('Polyv 播放器版本:', typeof polyvPlayer);
+
+  /**
+   * 强制播放调试函数
+   * @description 在控制台中手动调用此函数测试播放
+   */
+  window.forcePlay = function() {
+    console.log('手动强制播放');
+    try {
+      if (window.polyvPlayerInstance && window.polyvPlayerInstance.play) {
+        window.polyvPlayerInstance.j2s_resumeVideo(); // 使用 Polyv 特定方法
+        window.polyvPlayerInstance.play();
+        console.log('手动播放命令已执行');
+        return true;
+      } else {
+        console.log('播放器实例或播放方法不可用');
+        return false;
+      }
+    } catch (e) {
+      console.log('手动播放失败:', e);
+      return false;
+    }
+  };
+
+  // 添加全局播放状态检查和重播机制
+  setInterval(function() {
+    try {
+      if (player && typeof player.j2s_getCurrentTime === 'function') {
+        var currentTime = player.j2s_getCurrentTime();
+        var duration = player.j2s_getDuration();
+        
+        // 如果视频已经结束或者没有在播放，尝试重新播放
+        if ((duration > 0 && currentTime >= duration) || player.j2s_getPlayerState() === 'pause') {
+          console.log('检测到视频停止，尝试重新播放');
+          player.j2s_resumeVideo();
+          player.play();
+        }
+      }
+    } catch (e) {
+      // 静默处理错误
+    }
+  }, 5000); // 每5秒检查一次
+</script>
+
+</body>
+</html>
