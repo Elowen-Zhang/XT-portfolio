@@ -540,16 +540,12 @@
       <h2 data-lang="en">Technical Details</h2>
       <h2 class="hidden" data-lang="zh">技术细节</h2>
       <ul class="space-y-2" data-lang="en">
-        <li>Duration: 4:25</li>
-        <li>Format: 4K</li>
-        <li>Software: Cinema 4D, Octane</li>
-        <li>Year: 2023</li>
+        <li>Software: Cinema 4D, Octane，PS, PR</li>
+        <li>Year: 2022</li>
       </ul>
       <ul class="space-y-2 hidden" data-lang="zh">
-        <li>时长：4:25</li>
-        <li>格式：4K</li>
-        <li>软件：Cinema 4D, Octane</li>
-        <li>年份：2023</li>
+        <li>软件：Cinema 4D, Octane，PS, PR</li>
+        <li>年份：2022</li>
       </ul>
     </div>
   </div>
@@ -586,10 +582,7 @@
 </footer>
 
 <script>
-  /**
-   * 设置语言显示
-   * @param {string} lang - 语言代码 ('en' 或 'zh')
-   */
+
   function setLang(lang) {
     document.querySelectorAll('[data-lang]').forEach(el => {
       if (el.getAttribute('data-lang') === lang) {
@@ -612,14 +605,10 @@
     }
   }
 
-  /**
-   * 滚动到内容区域
-   */
   function scrollToContent() {
     document.getElementById('content').scrollIntoView({ behavior: 'smooth' });
   }
 
-  // 滚动事件监听
   window.addEventListener('scroll', () => {
     const scrollIndicator = document.querySelector('.scroll-indicator');
     
@@ -630,7 +619,6 @@
     }
   });
 
-  // 内容区域淡入动画观察器
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -645,26 +633,21 @@
     observer.observe(section);
   });
 
-  // 默认设置为英文
   setLang('en');
 
-  // 初始化polyv播放器 - 终极自动播放配置
   var player = polyvPlayer({
     'wrap':'#plv_ga697f2e89d9b79fb63163a8e2d57aee_g',
     'width':'100%',
     'height':'100%',
     'vid': 'ga697f2e89d9b79fb63163a8e2d57aee_g',
-    'autoplay': 1, // 强制自动播放
-    'loop': 1, // 循环播放
-    'volume': 0, // 静音播放
-    'muted': 1, // 强制静音
-    'playsafe': '', // 播放加密视频的凭证
-    'preload': 'auto', // 预加载视频
+    'autoplay': 1, 
+    'loop': 1, 
+    'playsafe': '', 
+    'preload': 'auto', 
     // 播放器事件回调
     'onReady': function() {
       console.log('播放器准备就绪，强制播放...');
       
-      // 方法1: 直接调用播放器API
       setTimeout(function() {
         try {
           player.play();
@@ -674,7 +657,6 @@
         }
       }, 100);
 
-      // 方法2: 查找并操作内部video元素
       setTimeout(function() {
         try {
           var videoElements = document.querySelectorAll('#plv_ga697f2e89d9b79fb63163a8e2d57aee_g video');
@@ -688,7 +670,6 @@
             video.controls = false;
             video.playsInline = true;
             
-            // 强制播放
             video.play().then(function() {
               console.log('video元素播放成功!', index);
             }).catch(function(error) {
@@ -700,7 +681,6 @@
         }
       }, 1000);
 
-      // 方法3: 持续检测并播放
       var checkInterval = setInterval(function() {
         try {
           var videoElements = document.querySelectorAll('#plv_ga697f2e89d9b79fb63163a8e2d57aee_g video');
@@ -717,7 +697,6 @@
         }
       }, 2000);
 
-      // 10秒后停止检测
       setTimeout(function() {
         clearInterval(checkInterval);
       }, 10000);
@@ -727,19 +706,15 @@
     }
   });
 
-  // 额外的自动播放保障机制
-  
-  // 页面加载完成后的终极尝试
+
   window.addEventListener('load', function() {
     setTimeout(function() {
       console.log('页面加载完成，执行最后的播放尝试...');
       
-      // 尝试播放器API
       if (player && typeof player.play === 'function') {
         player.play();
       }
       
-      // 尝试直接操作video元素
       var videos = document.querySelectorAll('#plv_ga697f2e89d9b79fb63163a8e2d57aee_g video');
       videos.forEach(function(video) {
         video.muted = true;
@@ -751,7 +726,6 @@
     }, 2000);
   });
 
-  // 用户交互后的播放尝试
   var hasTriedUserInteraction = false;
   function forcePlayOnInteraction() {
     if (!hasTriedUserInteraction) {
@@ -770,7 +744,6 @@
     }
   }
 
-  // 监听用户交互
   document.addEventListener('click', forcePlayOnInteraction, { once: true });
   document.addEventListener('touchstart', forcePlayOnInteraction, { once: true });
 </script>
