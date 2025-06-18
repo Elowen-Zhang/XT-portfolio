@@ -554,13 +554,13 @@
       <h2 data-lang="en">Technical Details</h2>
       <h2 class="hidden" data-lang="zh">技术细节</h2>
       <ul class="space-y-2" data-lang="en">
-        <li>Engine: Unity HDRP</li>
+        <li>Software: Unity，Maya，SP，Uduino</li>
         <li>Interaction: Kinect, TouchDesigner</li>
         <li>Hardware: Arduino</li>
         <li>Year: 2024</li>
       </ul>
       <ul class="space-y-2 hidden" data-lang="zh">
-        <li>引擎：Unity HDRP</li>
+        <li>软件：Unity，Maya，SP，Uduino</li>
         <li>交互：Kinect、TouchDesigner</li>
         <li>硬件：Arduino</li>
         <li>年份：2024</li>
@@ -652,14 +652,9 @@
 
   setLang('en');
 
-  /**
-   * 增强自动播放策略
-   * @description 页面加载完成后立即尝试多种方式启动视频播放
-   */
   function enhancedAutoPlay() {
     console.log('执行增强自动播放策略');
-    
-    // 策略1：直接播放
+
     setTimeout(function() {
       try {
         if (player) {
@@ -672,11 +667,10 @@
       }
     }, 200);
 
-    // 策略2：设置音量后播放
     setTimeout(function() {
       try {
         if (player) {
-          player.j2s_setVolume(50); // 设置音量为50%
+          player.j2s_setVolume(50); 
           player.j2s_resumeVideo();
           player.play();
           console.log('策略2：音量播放已执行');
@@ -686,7 +680,6 @@
       }
     }, 800);
 
-    // 策略3：模拟用户点击播放
     setTimeout(function() {
       try {
         var videoElement = document.querySelector('#plv_ga697f2e89c93359166a38c3b928679e_g video');
@@ -708,34 +701,29 @@
     }, 1500);
   }
 
-  // 页面完全加载后执行增强策略
   if (document.readyState === 'complete') {
     enhancedAutoPlay();
   } else {
     window.addEventListener('load', enhancedAutoPlay);
   }
 
-  /**
-   * 初始化 Polyv 播放器并强制自动播放
-   * @description 使用最强制的方式确保视频进入页面后立即自动播放
-   */
   var player = polyvPlayer({
     'wrap':'#plv_ga697f2e89c93359166a38c3b928679e_g',
     'width':'100%',
     'height':'100%',
     'vid': 'ga697f2e89c93359166a38c3b928679e_g',
-    'autoplay': true, // 自动播放
-    'loop': true, // 循环播放
-    'volume': 50, // 默认音量50%
-    'muted': false, // 开启声音
-    'preload': 'auto', // 预加载视频
-    'playsinline': true, // 移动端内联播放
-    'controls': false, // 隐藏控制条
-    'playsafe': '', // 播放加密视频的凭证
-    // 播放器事件回调
+    'autoplay': true, 
+    'loop': true, 
+    'volume': 50, 
+    'muted': false, 
+    'preload': 'auto', 
+    'playsinline': true,
+    'controls': false, 
+    'playsafe': '', 
+
     'onReady': function() {
       console.log('播放器准备完成，开始播放');
-      // 播放器准备好后立即播放
+
       setTimeout(function() {
         try {
           player.j2s_resumeVideo(); // 使用 Polyv 特定的播放方法
@@ -759,12 +747,6 @@
     }
   });
 
-  /**
-   * 多重播放保障机制
-   * @description 使用多种时机和方法确保视频能够自动播放
-   */
-  
-  // 立即尝试播放（播放器创建后）
   setTimeout(function() {
     console.log('立即尝试播放');
     try {
@@ -778,7 +760,6 @@
     }
   }, 100);
 
-  // 0.5秒后再次尝试
   setTimeout(function() {
     console.log('0.5秒后尝试播放');
     try {
@@ -792,7 +773,6 @@
     }
   }, 500);
 
-  // 页面 DOM 加载完成后尝试
   document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM 加载完成，尝试播放');
     setTimeout(function() {
@@ -807,11 +787,9 @@
     }, 500);
   });
 
-  // 页面完全加载后尝试
   window.addEventListener('load', function() {
     console.log('页面完全加载完成，尝试播放');
-    
-    // 1秒后尝试
+
     setTimeout(function() {
       try {
         if (player && player.play) {
@@ -823,7 +801,6 @@
       }
     }, 1000);
 
-    // 2秒后再次尝试
     setTimeout(function() {
       try {
         if (player && player.play) {
@@ -835,7 +812,6 @@
       }
     }, 2000);
 
-    // 3秒后最后尝试
     setTimeout(function() {
       try {
         if (player && player.play) {
@@ -848,7 +824,6 @@
     }, 3000);
   });
 
-  // 用户交互后立即播放（绕过浏览器自动播放限制）
   ['click', 'touchstart', 'keydown', 'mousemove', 'scroll'].forEach(function(event) {
     document.addEventListener(event, function() {
       console.log('用户交互 (' + event + ')，尝试播放');
@@ -864,7 +839,6 @@
     }, { once: true });
   });
 
-  // 页面可见性变化时尝试播放
   document.addEventListener('visibilitychange', function() {
     if (!document.hidden) {
       console.log('页面变为可见，尝试播放');
@@ -882,7 +856,6 @@
     }
   });
 
-  // 窗口获得焦点时尝试播放
   window.addEventListener('focus', function() {
     console.log('窗口获得焦点，尝试播放');
     setTimeout(function() {
@@ -898,18 +871,12 @@
     }, 200);
   });
 
-  // 存储播放器实例供调试使用
   window.polyvPlayerInstance = player;
-  
-  // 调试信息
+
   console.log('播放器实例已创建:', player);
   console.log('当前页面地址:', window.location.href);
   console.log('Polyv 播放器版本:', typeof polyvPlayer);
 
-  /**
-   * 强制播放调试函数
-   * @description 在控制台中手动调用此函数测试播放
-   */
   window.forcePlay = function() {
     console.log('手动强制播放');
     try {
@@ -928,14 +895,13 @@
     }
   };
 
-  // 添加全局播放状态检查和重播机制
   setInterval(function() {
     try {
       if (player && typeof player.j2s_getCurrentTime === 'function') {
         var currentTime = player.j2s_getCurrentTime();
         var duration = player.j2s_getDuration();
         
-        // 如果视频已经结束或者没有在播放，尝试重新播放
+       
         if ((duration > 0 && currentTime >= duration) || player.j2s_getPlayerState() === 'pause') {
           console.log('检测到视频停止，尝试重新播放');
           player.j2s_resumeVideo();
@@ -943,9 +909,9 @@
         }
       }
     } catch (e) {
-      // 静默处理错误
+      
     }
-  }, 5000); // 每5秒检查一次
+  }, 5000); 
 </script>
 
 </body>
